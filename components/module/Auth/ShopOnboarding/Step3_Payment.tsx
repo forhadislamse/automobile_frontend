@@ -56,7 +56,7 @@ function CheckoutForm({ clientSecret, orderId, planName, amount, onPrev }: Check
                 }).unwrap();
 
                 toast.success("Subscription activated successfully!", { id: toastId });
-                router.push("/dashboard");
+                router.push("/user/dashboard");
             }
         } catch (err: any) {
             toast.error(err?.data?.message || "Failed to finalize subscription", { id: toastId });
@@ -154,37 +154,64 @@ export default function Step3_Payment({ onPrev, data }: any) {
     useEffect(() => {
         let isMounted = true;
         const initIntent = async () => {
+            if (!isMounted) return;
+            console.log("Initializing Subscription Intent...", {
+                userId: user?.id || data?.userId,
+                planId: data.selectedPlan?.id || data.selectedPlan?._id,
+                duration: data.billingCycle
+            });
+            setIsInitializing(true);
             try {
                 const intentRes: any = await createIntent({
-                    planId: data.selectedPlan?.id,
+                    planId: data.selectedPlan?.id || data.selectedPlan?._id,
                     duration: data.billingCycle
                 }).unwrap();
+
+                console.log("Intent Response:", intentRes);
 
                 if (intentRes.success && isMounted) {
                     if (intentRes.data?.trialStarted) {
                         toast.success(intentRes.data.message || "Trial started!");
-                        router.push("/dashboard");
+                        router.push("/user/dashboard");
                     } else {
                         setClientSecret(intentRes.data?.clientSecret);
                         setOrderId(intentRes.data?.orderId);
                     }
                 }
             } catch (err: any) {
-                toast.error(err?.data?.message || "Failed to initialize subscription session");
+                console.error("Intent Initialization Failed:", err);
+                toast.error(err?.data?.message || err.message || "Failed to initialize subscription session");
             } finally {
                 if (isMounted) setIsInitializing(false);
             }
         };
 
-        const activeUserId = user?.id || data?.userId;
-        if (activeUserId && data.selectedPlan?.id) {
+        const activeUserId = user?.id || data?.userId || user?._id || data?.id;
+        const activePlanId = data.selectedPlan?.id || data.selectedPlan?._id;
+
+        if (activeUserId && activePlanId && data.billingCycle) {
             initIntent();
         } else {
-            setIsInitializing(false);
+            // Log what is missing
+            console.warn("Required data missing for intent:", { 
+                activeUserId, 
+                activePlanId, 
+                duration: data.billingCycle 
+            });
+            
+            // Wait slightly longer if plan is missing, in case of state lag
+            if (activePlanId) {
+                const timeout = setTimeout(() => {
+                   if (isMounted && !clientSecret) setIsInitializing(false);
+                }, 2000);
+                return () => clearTimeout(timeout);
+            } else {
+                setIsInitializing(false);
+            }
         }
 
         return () => { isMounted = false; };
-    }, [user?.id, data.userId, data.selectedPlan?.id, data.billingCycle, createIntent, router]);
+    }, [user?.id, user?._id, data.userId, data.selectedPlan?.id, data.selectedPlan?._id, data.billingCycle, createIntent, router]);
 
     const amount = data.selectedPlan?.prices.find((p: any) => p.duration === data.billingCycle)?.price || 0;
 

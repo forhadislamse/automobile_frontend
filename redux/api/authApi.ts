@@ -76,6 +76,20 @@ export const authApi = baseApi.injectEndpoints({
         method: "POST",
       }),
     }),
+    verifyEmailOtp: builder.mutation({
+      query: (data: any) => ({
+        url: "/auth/verify-email-otp",
+        method: "POST",
+        body: data,
+      }),
+    }),
+    deleteUser: builder.mutation({
+      query: () => ({
+        url: "/auth/delete-user",
+        method: "DELETE",
+      }),
+      invalidatesTags: ["User"],
+    }),
   }),
 });
 
@@ -90,4 +104,6 @@ export const {
   useGetMeQuery,
   useUpdateUserMutation,
   useLogoutMutation,
+  useVerifyEmailOtpMutation,
+  useDeleteUserMutation,
 } = authApi;

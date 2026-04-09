@@ -36,7 +36,7 @@ interface OtpProps {
 }
 
 export default function Otp({
-  successRedirect = (email) => `/forgot-password/otp/change-password?email=${email}`,
+  successRedirect = (email) => `/forgot-password/change-password?email=${email}`,
   successMessage,
   verifyMutation
 }: OtpProps) {
@@ -153,109 +153,79 @@ export default function Otp({
   }, []);
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center">
-      <AnimatePresence>
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.9, y: 20 }}
-          transition={{ duration: 0.3, ease: [0.4, 0.0, 0.2, 1] }}
-          className="relative z-10 w-full max-w-md"
-        >
-          <div className="bg-white p-8 mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.3 }}
-              className="text-center mb-8"
-            >
-              <h1 className="text-[40px] font-bold text-gray-900 mb-2">
-                Enter Code
-              </h1>
-              <p className="text-gray-600 text-[18px]">
-                We’ve sent a code to {email}
-              </p>
-            </motion.div>
+    <div className="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-2xl border border-gray-100">
+      <div className="mb-10">
+        <h1 className="text-3xl font-black text-[#0a1628] tracking-tight mb-3 text-center">Enter Code</h1>
+        <p className="text-gray-400 font-medium text-sm leading-relaxed text-center">
+          We have sent a verification code to email address: <br />
+          <span className="text-[#0a1628] font-bold">{email}</span>
+        </p>
+      </div>
 
-            <motion.form
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.3 }}
-              onSubmit={handleSubmit(onSubmit)}
-              className="space-y-6"
-            >
-              <div>
-                <div className="flex justify-between gap-1 sm:gap-2">
-                  {[0, 1, 2, 3, 4, 5].map((index) => (
-                    <div key={index} className="w-full">
-                      <input
-                        ref={(el) => {
-                          inputRefs.current[index] = el;
-                        }}
-                        type="text"
-                        inputMode="numeric"
-                        maxLength={6}
-                        value={otpValues[index]}
-                        onChange={(e) => handleChange(index, e.target.value)}
-                        onKeyDown={(e) => handleKeyDown(index, e)}
-                        className="w-12 aspect-square text-center text-xl font-medium border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors border-gray-300"
-                        aria-label={`Digit ${index + 1} of OTP`}
-                      />
-                    </div>
-                  ))}
-                </div>
-                {errors.otp && (
-                  <motion.p
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="mt-2 text-sm text-red-600 text-center"
-                  >
-                    Please enter a valid 6-digit code
-                  </motion.p>
-                )}
-              </div>
-              <div>
-                Didn’t get a code?{" "}
-                <span
-                  onClick={handleResendOtp}
-                  className="text-black font-semibold cursor-pointer hover:underline"
-                >
-                  Click to resend
-                </span>
-              </div>
-              <div className="flex justify-between items-center gap-4">
-                <motion.button
-                  type="submit"
-                  disabled={isVerifyingOtp || otpValues.some((v) => !v)}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="cursor-pointer w-full bg-primary disabled:bg-primary/60 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center"
-                >
-                  {isVerifyingOtp ? (
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  ) : (
-                    "Verify OTP"
-                  )}
-                </motion.button>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+        <div className="flex justify-between gap-2">
+          {[0, 1, 2, 3, 4, 5].map((index) => (
+            <div key={index} className="flex-1">
+              <input
+                ref={(el) => {
+                  inputRefs.current[index] = el;
+                }}
+                type="text"
+                inputMode="numeric"
+                maxLength={1}
+                value={otpValues[index]}
+                onChange={(e) => handleChange(index, e.target.value)}
+                onKeyDown={(e) => handleKeyDown(index, e)}
+                className="w-full aspect-square text-center text-2xl font-black rounded-2xl bg-gray-50 border-gray-100 focus:bg-white focus:ring-4 focus:ring-blue-50 focus:border-blue-200 outline-none transition-all text-[#0a1628]"
+              />
+            </div>
+          ))}
+        </div>
+        
+        {errors.otp && (
+          <p className="text-red-500 text-xs font-bold text-center -mt-4 animate-in fade-in slide-in-from-top-1">
+            Please enter a valid 6-digit verification code.
+          </p>
+        )}
 
-                <div>
-                  <Link
-                    href="/forgot-password"
-                    className="text-black font-semibold hover:underline"
-                  >
-                    <Button
-                      variant="outline"
-                      className="cursor-pointer w-full font-medium py-3 px-4 rounded-lg transition-colors duration-200 hover:bg-white flex items-center justify-center"
-                    >
-                      Cancel
-                    </Button>
-                  </Link>
-                </div>
+        <div className="text-center">
+          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+            Didn't get a code?{" "}
+            <button
+              type="button"
+              onClick={handleResendOtp}
+              className="text-blue-500 hover:text-blue-600 transition-colors ml-1 underline decoration-2 underline-offset-4"
+            >
+              Click to resend
+            </button>
+          </p>
+        </div>
+
+        <div className="space-y-4">
+          <Button
+            type="submit"
+            disabled={isVerifyingOtp || otpValues.some((v) => !v)}
+            className="w-full py-8 rounded-2xl bg-[#0a1628] hover:bg-gray-800 text-white font-black text-lg uppercase tracking-widest shadow-2xl shadow-blue-900/20 transition-all active:scale-[0.98]"
+          >
+            {isVerifyingOtp ? (
+              <div className="flex items-center gap-2">
+                <Loader2 className="animate-spin h-5 w-5" /> Verifying...
               </div>
-            </motion.form>
+            ) : (
+              "Verify"
+            )}
+          </Button>
+
+          <div className="text-center pt-4">
+            <Link
+              href="/forgot-password"
+              className="text-[11px] font-black text-gray-400 hover:text-[#0a1628] uppercase tracking-[0.2em] transition-colors"
+            >
+              Back to Signin
+            </Link>
           </div>
-        </motion.div>
-      </AnimatePresence>
+        </div>
+      </form>
     </div>
   );
 }

@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Step1_ShopSetup from "./Step1_ShopSetup";
 import Step2_PlanSelection from "./Step2_PlanSelection";
 import Step3_Payment from "./Step3_Payment";
 import Image from "next/image";
 import { useGetAllPlansQuery } from "@/redux/api/planApi";
+import { useAppSelector } from "@/redux/hooks";
 
 const steps = [
   { id: 1, name: "Shop Setup" },
@@ -16,8 +17,29 @@ const steps = [
 
 export default function ShopOnboarding() {
   const { data: plansData, isLoading: plansLoading } = useGetAllPlansQuery(undefined);
-  const [currentStep, setCurrentStep] = useState(1);
-  const [onboardingData, setOnboardingData] = useState<any>({});
+  const token = useAppSelector((state) => state.auth.token);
+  const user = useAppSelector((state) => state.auth.user);
+  
+  // If user is logged in, start from Step 2 (Plan Selection)
+  const [currentStep, setCurrentStep] = useState(token ? 2 : 1);
+  const [onboardingData, setOnboardingData] = useState<any>(user ? {
+    fullName: user.fullName,
+    email: user.email,
+    userId: user.id
+  } : {});
+
+  // Update data if user state changes late
+  useEffect(() => {
+    if (user && !onboardingData.userId) {
+       setOnboardingData((prev: any) => ({
+         ...prev,
+         fullName: user.fullName,
+         email: user.email,
+         userId: user.id
+       }));
+       if (currentStep === 1) setCurrentStep(2);
+    }
+  }, [user, onboardingData.userId, currentStep]);
 
   const nextStep = (data?: any) => {
     if (data) setOnboardingData((prev: any) => ({ ...prev, ...data }));

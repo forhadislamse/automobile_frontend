@@ -23,11 +23,14 @@ import { useRegisterMutation } from "@/redux/api/authApi";
 import { toast } from "sonner";
 import { useDispatch } from "react-redux";
 import { setUser } from "@/redux/features/authSlice";
+import { useAppSelector } from "@/redux/hooks";
 
 type FormData = z.infer<typeof shopSetupSchema>;
 
 export default function Step1_ShopSetup({ onNext, data }: any) {
   const dispatch = useDispatch();
+  const token = useAppSelector((state) => state.auth.token);
+  const user = useAppSelector((state) => state.auth.user);
   const [registerUser, { isLoading }] = useRegisterMutation();
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(shopSetupSchema),
@@ -36,7 +39,17 @@ export default function Step1_ShopSetup({ onNext, data }: any) {
 
   const handleFormSubmit = async (formData: FormData) => {
     try {
-      const res = await registerUser({
+      if (token && user) {
+        // User is already logged in, just proceed to next step
+        onNext({ 
+          ...formData, 
+          userId: user.id || user._id, 
+          token 
+        });
+        return;
+      }
+
+      const registrationData = {
         fullName: formData.fullName,
         email: formData.email,
         phone: formData.phoneNumber,
@@ -44,12 +57,14 @@ export default function Step1_ShopSetup({ onNext, data }: any) {
         shopName: formData.shopName,
         shopAddress: formData.shopAddress,
         role: "USER"
-      }).unwrap();
+      };
+      const res: any = await registerUser(registrationData).unwrap();
 
       if (res.success) {
         toast.success("Account created successfully!");
-        dispatch(setUser({ token: res.token, user: res.data }));
-        onNext({ ...formData, userId: res.data.id, token: res.token });
+        // res.data contains { user, token, refreshToken }
+        dispatch(setUser({ token: res.data.token, user: res.data.user }));
+        onNext({ ...formData, userId: res.data.user.id, token: res.data.token });
       }
     } catch (err: any) {
       toast.error(err?.data?.message || "Registration failed. Please try again.");

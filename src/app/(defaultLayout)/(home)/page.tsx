@@ -83,7 +83,7 @@ const PricingCard = ({ plan, user }: { plan: any, user: any }) => {
             </div>
 
             <div className="mt-auto">
-                <Link href={user ? "/dashboard" : "/signup"}>
+                <Link href={user ? "/dashboard" : "/shop-onboarding"}>
                     <Button 
                         variant={isCenter ? "default" : "outline"}
                         className={`w-full py-8 rounded-2xl font-black text-lg transition-all active:scale-95 mb-10 ${
@@ -157,11 +157,16 @@ export default function LandingPage() {
                                         View Pricing Plans <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                                     </Button>
                                 </Link>
-                                <Link href="/signup">
+                                <Link href="/shop-onboarding">
                                     <Button size="lg" variant="outline" className="border-2 border-white/20 text-white hover:bg-white/5 bg-transparent px-10 py-8 rounded-full text-lg font-bold transition-all tracking-wide">
                                         Get Started Now
                                     </Button>
                                 </Link>
+                            </div>
+                            <div className="mt-8">
+                                <p className="text-gray-500 font-bold uppercase tracking-[0.3em] text-[10px]">
+                                    Already have an account? <Link href="/login" className="text-blue-400 hover:text-blue-300 ml-2 border-b border-blue-400/30 pb-1 transition-all">Login Securely</Link>
+                                </p>
                             </div>
                         </motion.div>
                     </div>
@@ -224,7 +229,7 @@ export default function LandingPage() {
                     <p className="text-gray-400 max-w-2xl mx-auto mb-12 text-lg font-medium">
                         Join hundreds of shop owners who are already maximizing their efficiency with SmartAutoTech AI.
                     </p>
-                    <Link href="/signup">
+                    <Link href="/shop-onboarding">
                         <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-12 py-8 rounded-full text-xl font-bold shadow-2xl shadow-blue-900/40">
                              Get Started Now
                         </Button>
