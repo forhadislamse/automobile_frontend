@@ -90,7 +90,7 @@ const Step2_PlanSelection: React.FC<Step2Props> = ({ plans, onNext, onBack }) =>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 max-w-7xl mx-auto">
-        {plans.map((plan) => (
+        {plans?.map((plan) => (
           <PlanCard 
             key={plan.id} 
             plan={plan} 

@@ -19,17 +19,46 @@ const shopSetupSchema = z.object({
   path: ["confirmPassword"],
 });
 
+import { useRegisterMutation } from "@/redux/api/authApi";
+import { toast } from "sonner";
+import { useDispatch } from "react-redux";
+import { setUser } from "@/redux/features/authSlice";
+
 type FormData = z.infer<typeof shopSetupSchema>;
 
 export default function Step1_ShopSetup({ onNext, data }: any) {
+  const dispatch = useDispatch();
+  const [registerUser, { isLoading }] = useRegisterMutation();
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(shopSetupSchema),
     defaultValues: data,
   });
 
+  const handleFormSubmit = async (formData: FormData) => {
+    try {
+      const res = await registerUser({
+        fullName: formData.fullName,
+        email: formData.email,
+        phone: formData.phoneNumber,
+        password: formData.password,
+        shopName: formData.shopName,
+        shopAddress: formData.shopAddress,
+        role: "USER"
+      }).unwrap();
+
+      if (res.success) {
+        toast.success("Account created successfully!");
+        dispatch(setUser({ token: res.token, user: res.data }));
+        onNext({ ...formData, userId: res.data.id, token: res.token });
+      }
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Registration failed. Please try again.");
+    }
+  };
+
   return (
     <div className="bg-white rounded-3xl shadow-xl p-8 max-w-2xl mx-auto">
-      <form onSubmit={handleSubmit(onNext)} className="space-y-4">
+      <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Owner Name */}
           <div className="space-y-1">
@@ -134,9 +163,10 @@ export default function Step1_ShopSetup({ onNext, data }: any) {
 
         <button 
           type="submit"
-          className="w-full bg-[#0a1628] hover:bg-[#152a4a] text-white py-4 rounded-xl font-bold text-lg mt-6 shadow-lg shadow-blue-900/10 transition-all hover:-translate-y-0.5"
+          disabled={isLoading}
+          className="w-full bg-[#0a1628] hover:bg-[#152a4a] disabled:bg-gray-400 text-white py-4 rounded-xl font-bold text-lg mt-6 shadow-lg shadow-blue-900/10 transition-all hover:-translate-y-0.5"
         >
-          Continue
+          {isLoading ? "Creating Account..." : "Continue"}
         </button>
       </form>
     </div>

@@ -28,7 +28,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       {/* <body className={`${roboto.variable} ${montserrat.variable} antialiased font-montserrat`}> */}
       <body className={`${roboto.variable} antialiased`}>
         <Toaster position="top-center" richColors />

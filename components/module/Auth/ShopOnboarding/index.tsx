@@ -6,6 +6,7 @@ import Step1_ShopSetup from "./Step1_ShopSetup";
 import Step2_PlanSelection from "./Step2_PlanSelection";
 import Step3_Payment from "./Step3_Payment";
 import Image from "next/image";
+import { useGetAllPlansQuery } from "@/redux/api/planApi";
 
 const steps = [
   { id: 1, name: "Shop Setup" },
@@ -14,6 +15,7 @@ const steps = [
 ];
 
 export default function ShopOnboarding() {
+  const { data: plansData, isLoading: plansLoading } = useGetAllPlansQuery(undefined);
   const [currentStep, setCurrentStep] = useState(1);
   const [onboardingData, setOnboardingData] = useState<any>({});
 
@@ -73,7 +75,20 @@ export default function ShopOnboarding() {
             className="w-full"
           >
             {currentStep === 1 && <Step1_ShopSetup onNext={nextStep} data={onboardingData} />}
-            {currentStep === 2 && <Step2_PlanSelection onNext={nextStep} onPrev={prevStep} data={onboardingData} />}
+            {currentStep === 2 && (
+              plansLoading ? (
+                <div className="flex flex-col items-center justify-center py-20">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0a1628]"></div>
+                  <p className="mt-4 text-gray-500 font-medium italic">Loading plans...</p>
+                </div>
+              ) : (
+                <Step2_PlanSelection 
+                  plans={plansData?.data || []} 
+                  onNext={nextStep} 
+                  onBack={prevStep} 
+                />
+              )
+            )}
             {currentStep === 3 && <Step3_Payment onPrev={prevStep} data={onboardingData} />}
           </motion.div>
         </AnimatePresence>

@@ -18,6 +18,7 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAppSelector } from "@/redux/hooks";
 import { useGetMeQuery } from "@/redux/api/authApi";
+import Logo from "@/src/assets/logo2.png";
 
 // --- PRICING CARD COMPONENT (Individual Toggle) ---
 const PricingCard = ({ plan, user }: { plan: any, user: any }) => {

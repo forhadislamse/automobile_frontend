@@ -11,52 +11,74 @@ import { useRouter } from "next/navigation";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
+import { useEffect } from "react";
+
 function CheckoutForm({ onPrev, data }: any) {
   const stripe = useStripe();
   const elements = useElements();
   const router = useRouter();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(true);
+  const [clientSecret, setClientSecret] = useState("");
+  const [orderId, setOrderId] = useState("");
   
-  const [registerUser] = useRegisterMutation();
   const [createIntent] = useCreateSubscriptionIntentMutation();
   const [confirmPayment] = useConfirmPaymentMutation();
 
+  // Create Intent on Mount
+  useEffect(() => {
+    let isMounted = true;
+    const initIntent = async () => {
+      if (!isMounted) return;
+      setIsInitializing(true);
+      try {
+        const intentRes: any = await createIntent({
+          planId: data.selectedPlan?.id,
+          duration: data.billingCycle
+        }).unwrap();
+
+        if (intentRes.success && isMounted) {
+          if (intentRes.data?.trialStarted) {
+            toast.success(intentRes.data.message || "Trial started!");
+            router.push("/dashboard");
+          } else {
+            setClientSecret(intentRes.data?.clientSecret);
+            setOrderId(intentRes.data?.orderId);
+          }
+        }
+      } catch (err: any) {
+        toast.error(err?.data?.message || "Failed to initialize payment. Redirecting...");
+        // If it fails, maybe go back to plan selection
+        setTimeout(() => onPrev(), 2000);
+      } finally {
+        if (isMounted) setIsInitializing(false);
+      }
+    };
+
+    if (data.userId && data.selectedPlan?.id) {
+        initIntent();
+    } else {
+        setIsInitializing(false);
+    }
+
+    return () => { isMounted = false; };
+  }, [data.userId, data.selectedPlan?.id, data.billingCycle, createIntent, router, onPrev]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!stripe || !elements) return;
+    if (!stripe || !elements || !clientSecret) {
+        if (!clientSecret && !isInitializing) {
+            toast.error("Payment session not initialized. Please try again.");
+        }
+        return;
+    }
 
     setIsProcessing(true);
-    const toastId = toast.loading("Processing your subscription...");
+    const toastId = toast.loading("Confirming your payment...");
 
     try {
-      // 1. Register the user first
-      const registerRes = await registerUser({
-        fullName: data.fullName,
-        email: data.email,
-        phone: data.phoneNumber,
-        password: data.password,
-        shopName: data.shopName,
-        shopAddress: data.shopAddress,
-        role: "USER"
-      }).unwrap();
-
-      if (!registerRes.success) throw new Error("Registration failed");
-
-      // 2. Create Subscription Intent
-      const intentRes = await createIntent({
-        planId: data.selectedPlan.id,
-        duration: data.billingCycle
-      }).unwrap();
-
-      // If it's a trial, it might be auto-confirmed by the backend
-      if (intentRes.trialStarted) {
-        toast.success("Trial started successfully!", { id: toastId });
-        router.push("/dashboard"); // Or wherever the dashboard is
-        return;
-      }
-
-      // 3. Confirm with Stripe
-      const { paymentIntent, error } = await stripe.confirmCardPayment(intentRes.clientSecret, {
+      // 1. Confirm with Stripe
+      const { paymentIntent, error } = await stripe.confirmCardPayment(clientSecret, {
         payment_method: {
           card: elements.getElement(CardElement)!,
           billing_details: {
@@ -68,9 +90,9 @@ function CheckoutForm({ onPrev, data }: any) {
 
       if (error) throw new Error(error.message);
 
-      // 4. Confirm in our backend
+      // 2. Confirm in our backend
       await confirmPayment({
-        paymentId: intentRes.paymentId,
+        paymentId: orderId, // Use the stored orderId from backend
         paymentIntentId: paymentIntent.id
       }).unwrap();
 
@@ -85,7 +107,16 @@ function CheckoutForm({ onPrev, data }: any) {
   };
 
   return (
-    <div className="bg-white rounded-3xl shadow-xl p-8 max-w-4xl mx-auto flex flex-col md:flex-row gap-8">
+    <div className="relative">
+      {isInitializing && (
+        <div className="absolute inset-0 z-50 bg-white/80 backdrop-blur-sm rounded-3xl flex flex-col items-center justify-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0a1628]"></div>
+            <p className="mt-4 text-[#0a1628] font-bold animate-pulse text-lg">Initializing secure session...</p>
+            <p className="text-sm text-gray-400 mt-2">Setting up your secure checkout</p>
+        </div>
+      )}
+      
+      <div className="bg-white rounded-3xl shadow-xl p-8 max-w-4xl mx-auto flex flex-col md:flex-row gap-8">
       {/* Summary Side */}
       <div className="w-full md:w-1/2 bg-gray-50 rounded-2xl p-6 border border-gray-100">
         <h3 className="text-lg font-bold text-[#0a1628] mb-4">Complete Your Subscription</h3>
@@ -152,6 +183,7 @@ function CheckoutForm({ onPrev, data }: any) {
           {isProcessing ? "Processing..." : "Complete Subscription"}
         </button>
       </form>
+    </div>
     </div>
   );
 }
