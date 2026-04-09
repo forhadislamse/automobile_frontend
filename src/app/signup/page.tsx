@@ -1,9 +1,9 @@
-import RegisterPage from "@/components/module/Auth/SignUp";
+import ShopOnboarding from "@/components/module/Auth/ShopOnboarding";
 
 const page = () => {
     return (
         <div>
-            <RegisterPage />
+            <ShopOnboarding />
         </div>
     );
 };
