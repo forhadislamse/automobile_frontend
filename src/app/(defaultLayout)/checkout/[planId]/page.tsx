@@ -2,8 +2,8 @@
 
 import { useGetPlanByIdQuery } from "@/redux/api/planApi";
 import { useCreateSubscriptionIntentMutation } from "@/redux/api/paymentApi";
-import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState, useRef } from "react";
+import { useSearchParams, useParams, useRouter } from "next/navigation";
+import { useEffect, useState, useRef, Suspense } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import CheckoutForm from "@/components/module/Payment/CheckoutForm";
@@ -14,32 +14,37 @@ import {
     CreditCard, 
     ShieldCheck, 
     Zap,
-    BadgeCheck
+    BadgeCheck,
+    CalendarClock
 } from "lucide-react";
 import Link from "next/link";
 
 // Initialize Stripe outside of component to avoid recreation
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string);
 
-export default function CheckoutPage() {
+function CheckoutContent() {
     const params = useParams();
+    const searchParams = useSearchParams();
     const router = useRouter();
     const planId = params.planId as string;
+    const duration = searchParams.get("duration") || "Monthly";
     
     const { data: planResult, isLoading: planLoading } = useGetPlanByIdQuery(planId);
     const isInitialMount = useRef(true);
     const [createSubscriptionIntent, { data: intentResult, isLoading: intentLoading }] = useCreateSubscriptionIntentMutation();
     const [clientSecret, setClientSecret] = useState<string | null>(null);
     const [orderId, setOrderId] = useState<string | null>(null);
+    const [trialStarted, setTrialStarted] = useState(false);
 
     useEffect(() => {
         if (planId && !clientSecret && !orderId && isInitialMount.current) {
             isInitialMount.current = false;
-            createSubscriptionIntent({ planId })
+            createSubscriptionIntent({ planId, duration })
                 .unwrap()
                 .then((res: any) => {
                     setClientSecret(res.data.clientSecret);
                     setOrderId(res.data.orderId);
+                    setTrialStarted(res.data.trialStarted || false);
                 })
                 .catch((err) => {
                     console.error("Failed to create intent", err);
@@ -47,7 +52,7 @@ export default function CheckoutPage() {
                     toast.error(err?.data?.message || "Payment session failed to initialize");
                 });
         }
-    }, [planId, createSubscriptionIntent, clientSecret, orderId]);
+    }, [planId, duration, createSubscriptionIntent, clientSecret, orderId]);
 
     if (planLoading || intentLoading) {
         return (
@@ -99,11 +104,13 @@ export default function CheckoutPage() {
                     <div className="lg:col-span-3 space-y-12">
                         <div className="space-y-4">
                             <h1 className="text-4xl font-black text-[#0F172A] tracking-tighter uppercase leading-none">
-                                Complete your <br />
-                                subscription.
+                                {trialStarted ? "Start your free trial." : "Complete your subscription."}
                             </h1>
                             <p className="text-gray-500 italic font-medium leading-relaxed">
-                                Enter your payment details securely through Stripe. No card info is stored on our servers.
+                                {trialStarted 
+                                    ? "Start using SmartAutoTech today for free. Your card will not be charged for 14 days." 
+                                    : "Enter your payment details securely through Stripe. No card info is stored on our servers."
+                                }
                             </p>
                         </div>
 
@@ -113,7 +120,8 @@ export default function CheckoutPage() {
                                     clientSecret={clientSecret} 
                                     orderId={orderId} 
                                     planName={plan.name}
-                                    amount={plan.price}
+                                    amount={trialStarted ? 0 : plan.prices.find((p: any) => p.duration === duration)?.price || 0}
+                                    isTrial={trialStarted}
                                 />
                             </Elements>
                         )}
@@ -144,12 +152,24 @@ export default function CheckoutPage() {
                                 </div>
 
                                 <div className="pt-8 mt-8 border-t border-white/10 flex items-end justify-between">
-                                    <div className="text-[10px] font-black uppercase tracking-widest text-gray-400">Recurring Price</div>
+                                    <div className="text-[10px] font-black uppercase tracking-widest text-gray-400">
+                                        {trialStarted ? "Future Billing Price" : "Recurring Price"}
+                                    </div>
                                     <div className="text-3xl font-black">
-                                        ${plan.price}
-                                        <span className="text-sm font-normal text-gray-500 ml-1">/{plan.duration === 'yearly' ? 'yr' : 'mo'}</span>
+                                        ${plan.prices.find((p: any) => p.duration === duration)?.price || 0}
+                                        <span className="text-sm font-normal text-gray-500 ml-1">/{duration === 'Annually' ? 'yr' : 'mo'}</span>
                                     </div>
                                 </div>
+
+                                {trialStarted && (
+                                    <div className="p-4 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-start gap-3">
+                                        <CalendarClock className="text-blue-400 shrink-0" size={18} />
+                                        <div className="space-y-1">
+                                            <p className="text-xs font-black uppercase text-blue-400">Trial Active</p>
+                                            <p className="text-[10px] text-gray-300 leading-tight">Your 14-day trial starts now. You will not be charged until the trial ends.</p>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
 
@@ -160,12 +180,24 @@ export default function CheckoutPage() {
                             </div>
                             <div className="text-left">
                                 <h4 className="font-bold text-gray-900 text-sm leading-none mb-1">Instant Activation</h4>
-                                <p className="text-[10px] text-gray-400 font-medium">Unlocked immediately after payment.</p>
+                                <p className="text-[10px] text-gray-400 font-medium">Unlocked immediately after confirmation.</p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function CheckoutPage() {
+    return (
+        <Suspense fallback={
+            <div className="flex flex-col items-center justify-center min-h-screen gap-4">
+                <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
+            </div>
+        }>
+            <CheckoutContent />
+        </Suspense>
     );
 }

@@ -83,7 +83,7 @@ const PricingCard = ({ plan, user }: { plan: any, user: any }) => {
             </div>
 
             <div className="mt-auto">
-                <Link href={user ? "/dashboard" : "/shop-onboarding"}>
+                <Link href={user ? `/checkout/${plan.id}?duration=${billingCycle}` : `/signup?redirect=/checkout/${plan.id}&duration=${billingCycle}`}>
                     <Button 
                         variant={isCenter ? "default" : "outline"}
                         className={`w-full py-8 rounded-2xl font-black text-lg transition-all active:scale-95 mb-10 ${

@@ -26,10 +26,10 @@ export const paymentApi = baseApi.injectEndpoints({
       }),
       providesTags: ["Subscriptions"],
     }),
-    updateSubscriptionDuration: builder.mutation({
-      query: ({ subscriptionId, data }: { subscriptionId: string; data: { newDuration: string } }) => ({
-        url: `/payment/subscription/${subscriptionId}/update-duration`,
-        method: "PATCH",
+    changeSubscriptionPlan: builder.mutation({
+      query: (data: { subscriptionId: string; newPlanId: string; newDuration: string; technicianIds?: string[] }) => ({
+        url: "/payment/change-plan",
+        method: "POST",
         body: data,
       }),
       invalidatesTags: ["Subscriptions", "User"],
@@ -41,5 +41,5 @@ export const {
   useCreateSubscriptionIntentMutation, 
   useConfirmPaymentMutation, 
   useGetMySubscriptionsQuery,
-  useUpdateSubscriptionDurationMutation
+  useChangeSubscriptionPlanMutation
 } = paymentApi;
