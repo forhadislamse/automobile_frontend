@@ -17,9 +17,10 @@ interface CheckoutFormProps {
     orderId: string;
     planName: string;
     amount: number;
+    isTrial?: boolean;
 }
 
-export default function CheckoutForm({ clientSecret, orderId, planName, amount }: CheckoutFormProps) {
+export default function CheckoutForm({ clientSecret, orderId, planName, amount, isTrial = false }: CheckoutFormProps) {
     const stripe = useStripe();
     const elements = useElements();
     const router = useRouter();
@@ -42,25 +43,39 @@ export default function CheckoutForm({ clientSecret, orderId, planName, amount }
             return;
         }
 
-        const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-            payment_method: {
-                card: cardElement,
-            },
-        });
+        let result: any;
+
+        if (isTrial) {
+            // For $0 trials, we confirm the SetupIntent to save the payment method
+            result = await stripe.confirmCardSetup(clientSecret, {
+                payment_method: {
+                    card: cardElement,
+                },
+            });
+        } else {
+            // For regular payments, we confirm the PaymentIntent
+            result = await stripe.confirmCardPayment(clientSecret, {
+                payment_method: {
+                    card: cardElement,
+                },
+            });
+        }
+
+        const { error, paymentIntent, setupIntent } = result;
 
         if (error) {
-            toast.error(error.message || "Payment failed");
+            toast.error(error.message || "Confirmation failed");
             setIsProcessing(false);
-        } else if (paymentIntent.status === "succeeded") {
+        } else if ((paymentIntent && paymentIntent.status === "succeeded") || (setupIntent && setupIntent.status === "succeeded")) {
             try {
-                // Confirm on backend
+                // Confirm on backend using the payment record ID (orderId)
                 await confirmPayment({
-                    id: orderId,
-                    paymentIntentId: paymentIntent.id
+                    paymentId: orderId,
+                    paymentIntentId: paymentIntent?.id || setupIntent?.id
                 }).unwrap();
 
-                toast.success("Subscription activated successfully!");
-                router.push("/user/reader");
+                toast.success(isTrial ? "Trial started successfully!" : "Subscription activated successfully!");
+                router.push("/user/dashboard");
             } catch (err: any) {
                 toast.error(err?.data?.message || "Failed to finalize subscription");
                 setIsProcessing(false);
