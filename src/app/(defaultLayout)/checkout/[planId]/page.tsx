@@ -42,9 +42,11 @@ function CheckoutContent() {
             createSubscriptionIntent({ planId, duration })
                 .unwrap()
                 .then((res: any) => {
-                    setClientSecret(res.data.clientSecret);
-                    setOrderId(res.data.orderId);
-                    setTrialStarted(res.data.trialStarted || false);
+                    if (res && res.data) {
+                        setClientSecret(res.data.clientSecret);
+                        setOrderId(res.data.orderId);
+                        setTrialStarted(res.data.trialStarted || false);
+                    }
                 })
                 .catch((err) => {
                     console.error("Failed to create intent", err);
