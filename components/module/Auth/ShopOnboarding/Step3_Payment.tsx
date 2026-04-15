@@ -173,29 +173,47 @@ export default function Step3_Payment({ onPrev, data }: any) {
         const initIntent = async () => {
             if (!isMounted || hasInitialized.current) return;
             
+            const activeUserId = user?.id || data?.userId || user?._id || data?.id;
+            const activePlanId = data.selectedPlan?.id || data.selectedPlan?._id;
 
-                console.log("Intent Initialization Success:", intentRes);
+            if (!token) {
+                console.warn("Waiting for auth token to initialize payment...");
+                return;
+            }
 
-                if (intentRes.success && isMounted) {
-                    if (intentRes.data?.trialStarted) {
-                        toast.success(intentRes.data.message || "Trial started!");
-                        router.push("/user/dashboard");
-                    } else {
-                        setClientSecret(intentRes.data?.clientSecret);
-                        setOrderId(intentRes.data?.orderId);
+            if (activeUserId && activePlanId && data.billingCycle) {
+                hasInitialized.current = true;
+                setIsInitializing(true);
+                console.log("Initializing Subscription Intent with Auth:", { activeUserId, activePlanId, hasToken: !!token });
+                try {
+                    const intentRes: any = await createIntent({
+                        planId: activePlanId,
+                        duration: data.billingCycle
+                    }).unwrap();
+
+                    console.log("Intent Initialization Success:", intentRes);
+
+                    if (intentRes.success && isMounted) {
+                        if (intentRes.data?.trialStarted) {
+                            toast.success(intentRes.data.message || "Trial started!");
+                            router.push("/user/dashboard");
+                        } else {
+                            setClientSecret(intentRes.data?.clientSecret);
+                            setOrderId(intentRes.data?.orderId);
+                        }
                     }
+                } catch (err: any) {
+                    console.error("Intent Initialization Failed Deep Check:", {
+                        error: err,
+                        status: err?.status,
+                        message: err?.data?.message || err.message,
+                        auth: { userId: user?.id, dataUserId: data?.userId }
+                    });
+                    hasInitialized.current = false; // Allow retry on failure
+                    toast.error(err?.data?.message || err.message || "Failed to initialize subscription session");
+                } finally {
+                    if (isMounted) setIsInitializing(false);
                 }
-            } catch (err: any) {
-                console.error("Intent Initialization Failed Deep Check:", {
-                    error: err,
-                    status: err?.status,
-                    message: err?.data?.message || err.message,
-                    auth: { userId: user?.id, dataUserId: data?.userId }
-                });
-                hasInitialized.current = false; // Allow retry on failure
-                toast.error(err?.data?.message || err.message || "Failed to initialize subscription session");
-            } finally {
-                if (isMounted) setIsInitializing(false);
             }
         };
 
