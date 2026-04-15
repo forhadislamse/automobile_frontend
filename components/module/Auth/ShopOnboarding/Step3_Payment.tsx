@@ -169,80 +169,40 @@ export default function Step3_Payment({ onPrev, data }: any) {
     const [createIntent] = useCreateSubscriptionIntentMutation();
 
     useEffect(() => {
-        let isMounted = true;
-        const initIntent = async () => {
-            if (!isMounted || hasInitialized.current) return;
+        if (data.selectedPlan && !clientSecret && !orderId && !hasInitialized.current) {
+            hasInitialized.current = true;
+            const activePlanId = data.selectedPlan.id || data.selectedPlan._id;
             
-            const activeUserId = user?.id || data?.userId || user?._id || data?.id;
-            const activePlanId = data.selectedPlan?.id || data.selectedPlan?._id;
-
-            if (!token) {
-                console.warn("Waiting for auth token to initialize payment...");
-                return;
-            }
-
-            if (activeUserId && activePlanId && data.billingCycle) {
-                hasInitialized.current = true;
-                setIsInitializing(true);
-                console.log("Initializing Subscription Intent with Auth:", { activeUserId, activePlanId, hasToken: !!token });
-                try {
-                    const intentRes: any = await createIntent({
-                        planId: activePlanId,
-                        duration: data.billingCycle
-                    }).unwrap();
-
-                    console.log("Intent Initialization Success:", intentRes);
-
-                    if (intentRes.success && isMounted) {
-                        if (intentRes.data?.trialStarted) {
-                            toast.success(intentRes.data.message || "Trial started!");
-                            router.push("/user/dashboard");
-                        } else {
-                            setClientSecret(intentRes.data?.clientSecret);
-                            setOrderId(intentRes.data?.orderId);
-                        }
+            setIsInitializing(true);
+            console.log("Initializing Subscription Intent...", { activePlanId, duration: data.billingCycle });
+            
+            createIntent({
+                planId: activePlanId,
+                duration: data.billingCycle
+            })
+            .unwrap()
+            .then((intentRes: any) => {
+                console.log("Intent Initialization Success:", intentRes);
+                if (intentRes.success) {
+                    if (intentRes.data?.trialStarted) {
+                        toast.success(intentRes.data.message || "Trial started!");
+                        router.push("/user/dashboard");
+                    } else {
+                        setClientSecret(intentRes.data?.clientSecret);
+                        setOrderId(intentRes.data?.orderId);
                     }
-                } catch (err: any) {
-                    console.error("Intent Initialization Failed Deep Check:", {
-                        error: err,
-                        status: err?.status,
-                        message: err?.data?.message || err.message,
-                        auth: { userId: user?.id, dataUserId: data?.userId }
-                    });
-                    hasInitialized.current = false; // Allow retry on failure
-                    toast.error(err?.data?.message || err.message || "Failed to initialize subscription session");
-                } finally {
-                    if (isMounted) setIsInitializing(false);
                 }
-            }
-        };
-
-        const activeUserId = user?.id || data?.userId || user?._id || data?.id;
-        const activePlanId = data.selectedPlan?.id || data.selectedPlan?._id;
-
-        if (activeUserId && activePlanId && data.billingCycle && !hasInitialized.current) {
-            initIntent();
-        } else if (!hasInitialized.current) {
-            // Log what is missing (only if not already initialized)
-            console.warn("Required data missing for intent:", { 
-                activeUserId, 
-                activePlanId, 
-                duration: data.billingCycle 
-            });
-            
-            // Wait slightly longer if plan is missing, in case of state lag
-            if (activePlanId) {
-                const timeout = setTimeout(() => {
-                   if (isMounted && !clientSecret && !hasInitialized.current) setIsInitializing(false);
-                }, 2000);
-                return () => clearTimeout(timeout);
-            } else {
+            })
+            .catch((err: any) => {
+                console.error("Intent Initialization Failed:", err);
+                hasInitialized.current = false; // Allow retry on failure
+                toast.error(err?.data?.message || "Failed to initialize payment session");
+            })
+            .finally(() => {
                 setIsInitializing(false);
-            }
+            });
         }
-
-        return () => { isMounted = false; };
-    }, [user?.id, user?._id, data.userId, data.selectedPlan?.id, data.selectedPlan?._id, data.billingCycle, createIntent, router, token]);
+    }, [data.selectedPlan, data.billingCycle, createIntent, clientSecret, orderId, router]);
 
     const amount = data.selectedPlan?.prices.find((p: any) => p.duration === data.billingCycle)?.price || 0;
 
