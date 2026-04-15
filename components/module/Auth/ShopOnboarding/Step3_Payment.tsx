@@ -242,7 +242,7 @@ export default function Step3_Payment({ onPrev, data }: any) {
         }
 
         return () => { isMounted = false; };
-    }, [user?.id, user?._id, data.userId, data.selectedPlan?.id, data.selectedPlan?._id, data.billingCycle, createIntent, router]);
+    }, [user?.id, user?._id, data.userId, data.selectedPlan?.id, data.selectedPlan?._id, data.billingCycle, createIntent, router, token]);
 
     const amount = data.selectedPlan?.prices.find((p: any) => p.duration === data.billingCycle)?.price || 0;
 

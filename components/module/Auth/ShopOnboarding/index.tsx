@@ -10,6 +10,7 @@ import { useGetAllPlansQuery } from "@/redux/api/planApi";
 import { useAppSelector } from "@/redux/hooks";
 import { useDispatch } from "react-redux";
 import { logout } from "@/redux/features/authSlice";
+import { useRouter } from "next/navigation";
 
 const steps = [
   { id: 1, name: "Shop Setup" },
@@ -18,6 +19,7 @@ const steps = [
 ];
 
 export default function ShopOnboarding() {
+  const router = useRouter();
   const { data: plansData, isLoading: plansLoading } = useGetAllPlansQuery(undefined);
   const token = useAppSelector((state) => state.auth.token);
   const user = useAppSelector((state) => state.auth.user);
