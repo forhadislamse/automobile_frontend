@@ -22,8 +22,10 @@ const shopSetupSchema = z.object({
 import { useRegisterMutation } from "@/redux/api/authApi";
 import { toast } from "sonner";
 import { useDispatch } from "react-redux";
-import { setUser } from "@/redux/features/authSlice";
+import { useGetAllPlansQuery } from "@/redux/api/planApi";
 import { useAppSelector } from "@/redux/hooks";
+import { logout } from "@/redux/features/authSlice";
+import { setUser } from "@/redux/features/authSlice";
 
 type FormData = z.infer<typeof shopSetupSchema>;
 
@@ -39,16 +41,7 @@ export default function Step1_ShopSetup({ onNext, data }: any) {
 
   const handleFormSubmit = async (formData: FormData) => {
     try {
-      if (token && user) {
-        console.log("User already logged in, skipping registration:", { token, userId: user?.id });
-        // User is already logged in, just proceed to next step
-        onNext({ 
-          ...formData, 
-          userId: user.id || user._id, 
-          token 
-        });
-        return;
-      }
+      // Always proceed with registration if we are on Step 1
 
       const registrationData = {
         fullName: formData.fullName,
@@ -63,6 +56,7 @@ export default function Step1_ShopSetup({ onNext, data }: any) {
       const res: any = await registerUser(registrationData).unwrap();
 
       if (res.success) {
+        console.log("Registration Success Response:", res);
         toast.success("Account created successfully!");
         
         // Extract data properly
@@ -79,6 +73,12 @@ export default function Step1_ShopSetup({ onNext, data }: any) {
         });
       }
     } catch (err: any) {
+      console.error("Registration Error Details:", {
+        error: err,
+        status: err?.status,
+        message: err?.data?.message || err.message,
+        data: err?.data
+      });
       toast.error(err?.data?.message || "Registration failed. Please try again.");
     }
   };

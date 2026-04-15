@@ -157,7 +157,7 @@ export default function LandingPage() {
                                         View Pricing Plans <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                                     </Button>
                                 </Link>
-                                <Link href="/shop-onboarding">
+                                <Link href={token ? "#pricing" : "/shop-onboarding"}>
                                     <Button size="lg" variant="outline" className="border-2 border-white/20 text-white hover:bg-white/5 bg-transparent px-10 py-8 rounded-full text-lg font-bold transition-all tracking-wide">
                                         Get Started Now
                                     </Button>

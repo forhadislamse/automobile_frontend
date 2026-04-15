@@ -8,6 +8,8 @@ import Step3_Payment from "./Step3_Payment";
 import Image from "next/image";
 import { useGetAllPlansQuery } from "@/redux/api/planApi";
 import { useAppSelector } from "@/redux/hooks";
+import { useDispatch } from "react-redux";
+import { logout } from "@/redux/features/authSlice";
 
 const steps = [
   { id: 1, name: "Shop Setup" },
@@ -19,16 +21,18 @@ export default function ShopOnboarding() {
   const { data: plansData, isLoading: plansLoading } = useGetAllPlansQuery(undefined);
   const token = useAppSelector((state) => state.auth.token);
   const user = useAppSelector((state) => state.auth.user);
+  const dispatch = useDispatch();
   
-  // If user is logged in, start from Step 2 (Plan Selection)
-  const [currentStep, setCurrentStep] = useState(token ? 2 : 1);
-  const [onboardingData, setOnboardingData] = useState<any>(user ? {
-    fullName: user.fullName,
-    email: user.email,
-    userId: user.id
-  } : {});
+  // Always start from Step 1 for a fresh onboarding experience
+  const [currentStep, setCurrentStep] = useState(1);
+  const [onboardingData, setOnboardingData] = useState<any>({});
 
-  // Update data if user state changes late
+  // Handle access control for existing users
+  useEffect(() => {
+    if (token && user?.isSubscribed) {
+      router.push("/user/dashboard");
+    }
+  }, [token, user, router]);
   useEffect(() => {
     if (user && !onboardingData.userId) {
        setOnboardingData((prev: any) => ({
@@ -37,9 +41,8 @@ export default function ShopOnboarding() {
          email: user.email,
          userId: user.id
        }));
-       if (currentStep === 1) setCurrentStep(2);
     }
-  }, [user, onboardingData.userId, currentStep]);
+  }, [user, onboardingData.userId]);
 
   const nextStep = (data?: any) => {
     if (data) setOnboardingData((prev: any) => ({ ...prev, ...data }));
