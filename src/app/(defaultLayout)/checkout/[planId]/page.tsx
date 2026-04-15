@@ -37,8 +37,11 @@ function CheckoutContent() {
     const [trialStarted, setTrialStarted] = useState(false);
 
     useEffect(() => {
-        if (planId && !clientSecret && !orderId && isInitialMount.current) {
+        // Only run if we don't already have secret/orderId and it's the first mount call
+        if (planId && duration && !clientSecret && !orderId && isInitialMount.current) {
             isInitialMount.current = false;
+            console.log("Initializing Subscription Intent for direct checkout...", { planId, duration });
+            
             createSubscriptionIntent({ planId, duration })
                 .unwrap()
                 .then((res: any) => {

@@ -40,6 +40,7 @@ export default function Step1_ShopSetup({ onNext, data }: any) {
   const handleFormSubmit = async (formData: FormData) => {
     try {
       if (token && user) {
+        console.log("User already logged in, skipping registration:", { token, userId: user?.id });
         // User is already logged in, just proceed to next step
         onNext({ 
           ...formData, 
@@ -58,13 +59,24 @@ export default function Step1_ShopSetup({ onNext, data }: any) {
         shopAddress: formData.shopAddress,
         role: "USER"
       };
+      console.log("Sending registration data:", registrationData);
       const res: any = await registerUser(registrationData).unwrap();
 
       if (res.success) {
         toast.success("Account created successfully!");
-        // res.data contains { user, token, refreshToken }
-        dispatch(setUser({ token: res.data.token, user: res.data.user }));
-        onNext({ ...formData, userId: res.data.user.id, token: res.data.token });
+        
+        // Extract data properly
+        const { user: newUser, token: newToken } = res.data;
+        
+        // 🚀 Sync State Immediately
+        dispatch(setUser({ token: newToken, user: newUser }));
+        
+        // Pass IDs to the parent state as well
+        onNext({ 
+          ...formData, 
+          userId: newUser.id, 
+          token: newToken 
+        });
       }
     } catch (err: any) {
       toast.error(err?.data?.message || "Registration failed. Please try again.");

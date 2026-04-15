@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { useCreateSubscriptionIntentMutation, useConfirmPaymentMutation } from "@/redux/api/paymentApi";
@@ -17,9 +17,10 @@ interface CheckoutFormProps {
     planName: string;
     amount: number;
     onPrev: () => void;
+    isTrial?: boolean;
 }
 
-function CheckoutForm({ clientSecret, orderId, planName, amount, onPrev }: CheckoutFormProps) {
+function CheckoutForm({ clientSecret, orderId, planName, amount, onPrev, isTrial = false }: CheckoutFormProps) {
     const stripe = useStripe();
     const elements = useElements();
     const router = useRouter();
@@ -37,25 +38,39 @@ function CheckoutForm({ clientSecret, orderId, planName, amount, onPrev }: Check
             return;
         }
 
-        const toastId = toast.loading("Processing your secure payment...");
+        const toastId = toast.loading(isTrial ? "Setting up your 14-day free trial..." : "Processing your secure payment...");
 
         try {
-            const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-                payment_method: {
-                    card: cardElement,
-                },
-            });
+            let result: any;
+            
+            if (isTrial) {
+                // For $0 trials, confirm SetupIntent to save the card
+                result = await stripe.confirmCardSetup(clientSecret, {
+                    payment_method: {
+                        card: cardElement,
+                    },
+                });
+            } else {
+                // For regular payments, confirm PaymentIntent
+                result = await stripe.confirmCardPayment(clientSecret, {
+                    payment_method: {
+                        card: cardElement,
+                    },
+                });
+            }
+
+            const { error, paymentIntent, setupIntent } = result;
 
             if (error) {
-                toast.error(error.message || "Payment failed", { id: toastId });
+                toast.error(error.message || "Confirmation failed", { id: toastId });
                 setIsProcessing(false);
-            } else if (paymentIntent?.status === "succeeded") {
+            } else if ((paymentIntent && paymentIntent.status === "succeeded") || (setupIntent && setupIntent.status === "succeeded")) {
                 await confirmPayment({
                     paymentId: orderId,
-                    paymentIntentId: paymentIntent.id
+                    paymentIntentId: paymentIntent?.id || setupIntent?.id
                 }).unwrap();
 
-                toast.success("Subscription activated successfully!", { id: toastId });
+                toast.success(isTrial ? "Free trial started successfully!" : "Subscription activated successfully!", { id: toastId });
                 router.push("/user/dashboard");
             }
         } catch (err: any) {
@@ -149,12 +164,15 @@ export default function Step3_Payment({ onPrev, data }: any) {
     const [orderId, setOrderId] = useState("");
     const user = useAppSelector((state) => state.auth.user);
     const router = useRouter();
+    const hasInitialized = useRef(false);
     const [createIntent] = useCreateSubscriptionIntentMutation();
 
     useEffect(() => {
         let isMounted = true;
         const initIntent = async () => {
-            if (!isMounted) return;
+            if (!isMounted || hasInitialized.current) return;
+            
+            hasInitialized.current = true;
             console.log("Initializing Subscription Intent...", {
                 userId: user?.id || data?.userId,
                 planId: data.selectedPlan?.id || data.selectedPlan?._id,
@@ -180,6 +198,7 @@ export default function Step3_Payment({ onPrev, data }: any) {
                 }
             } catch (err: any) {
                 console.error("Intent Initialization Failed:", err);
+                hasInitialized.current = false; // Allow retry on failure
                 toast.error(err?.data?.message || err.message || "Failed to initialize subscription session");
             } finally {
                 if (isMounted) setIsInitializing(false);
@@ -189,10 +208,10 @@ export default function Step3_Payment({ onPrev, data }: any) {
         const activeUserId = user?.id || data?.userId || user?._id || data?.id;
         const activePlanId = data.selectedPlan?.id || data.selectedPlan?._id;
 
-        if (activeUserId && activePlanId && data.billingCycle) {
+        if (activeUserId && activePlanId && data.billingCycle && !hasInitialized.current) {
             initIntent();
-        } else {
-            // Log what is missing
+        } else if (!hasInitialized.current) {
+            // Log what is missing (only if not already initialized)
             console.warn("Required data missing for intent:", { 
                 activeUserId, 
                 activePlanId, 
@@ -202,7 +221,7 @@ export default function Step3_Payment({ onPrev, data }: any) {
             // Wait slightly longer if plan is missing, in case of state lag
             if (activePlanId) {
                 const timeout = setTimeout(() => {
-                   if (isMounted && !clientSecret) setIsInitializing(false);
+                   if (isMounted && !clientSecret && !hasInitialized.current) setIsInitializing(false);
                 }, 2000);
                 return () => clearTimeout(timeout);
             } else {
@@ -232,6 +251,7 @@ export default function Step3_Payment({ onPrev, data }: any) {
                         planName={data.selectedPlan?.name} 
                         amount={amount}
                         onPrev={onPrev}
+                        isTrial={data.selectedPlan?.category === "PROFESSIONAL" && !user?.isTrialUsed}
                     />
                 ) : (
                     !isInitializing && (

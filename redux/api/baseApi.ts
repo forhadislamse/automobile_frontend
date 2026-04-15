@@ -20,6 +20,7 @@ const baseQueryWithAuth: ReturnType<typeof fetchBaseQuery> = async (
     },
   });
 
+  console.log("BaseAPI Request:", args);
   const result = await rawBaseQuery(args, api, extraOptions);
 
   if (
