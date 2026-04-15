@@ -165,6 +165,7 @@ export default function Step3_Payment({ onPrev, data }: any) {
     const user = useAppSelector((state) => state.auth.user);
     const router = useRouter();
     const hasInitialized = useRef(false);
+    const token = useAppSelector((state) => state.auth.token);
     const [createIntent] = useCreateSubscriptionIntentMutation();
 
     useEffect(() => {
@@ -172,20 +173,8 @@ export default function Step3_Payment({ onPrev, data }: any) {
         const initIntent = async () => {
             if (!isMounted || hasInitialized.current) return;
             
-            hasInitialized.current = true;
-            console.log("Initializing Subscription Intent...", {
-                userId: user?.id || data?.userId,
-                planId: data.selectedPlan?.id || data.selectedPlan?._id,
-                duration: data.billingCycle
-            });
-            setIsInitializing(true);
-            try {
-                const intentRes: any = await createIntent({
-                    planId: data.selectedPlan?.id || data.selectedPlan?._id,
-                    duration: data.billingCycle
-                }).unwrap();
 
-                console.log("Intent Response:", intentRes);
+                console.log("Intent Initialization Success:", intentRes);
 
                 if (intentRes.success && isMounted) {
                     if (intentRes.data?.trialStarted) {
@@ -197,7 +186,12 @@ export default function Step3_Payment({ onPrev, data }: any) {
                     }
                 }
             } catch (err: any) {
-                console.error("Intent Initialization Failed:", err);
+                console.error("Intent Initialization Failed Deep Check:", {
+                    error: err,
+                    status: err?.status,
+                    message: err?.data?.message || err.message,
+                    auth: { userId: user?.id, dataUserId: data?.userId }
+                });
                 hasInitialized.current = false; // Allow retry on failure
                 toast.error(err?.data?.message || err.message || "Failed to initialize subscription session");
             } finally {
