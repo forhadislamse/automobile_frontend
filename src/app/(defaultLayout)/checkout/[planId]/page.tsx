@@ -36,6 +36,39 @@ function CheckoutContent() {
     const [orderId, setOrderId] = useState<string | null>(null);
     const [trialStarted, setTrialStarted] = useState(false);
 
+    const user = useAppSelector((state) => state.auth.user);
+    
+    // Safety Guard: If already subscribed, don't allow double subscription
+    if (user?.isSubscribed) {
+        return (
+            <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center p-6 text-center">
+                <div className="w-24 h-24 bg-blue-50 rounded-[2.5rem] flex items-center justify-center mb-8 shadow-sm">
+                    <ShieldCheck className="w-12 h-12 text-blue-600" />
+                </div>
+                <h1 className="text-4xl font-black text-[#0F172A] tracking-tighter uppercase mb-4 leading-none">
+                    Already a <br /> Member.
+                </h1>
+                <p className="text-gray-500 max-w-md mx-auto mb-10 italic font-medium leading-relaxed">
+                    You already have an active subscription. To upgrade or downgrade your current plan, please use the subscription management tools in your dashboard.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4">
+                    <button 
+                        onClick={() => router.push("/user/dashboard")}
+                        className="bg-[#0F172A] text-white px-10 py-4 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-black transition-all shadow-xl shadow-black/10"
+                    >
+                        Go to Dashboard
+                    </button>
+                    <button 
+                        onClick={() => router.push("/#pricing")}
+                        className="bg-white border-2 border-gray-100 text-gray-400 px-10 py-4 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-gray-50 hover:text-gray-900 transition-all"
+                    >
+                        Compare Plans
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
     useEffect(() => {
         // Only run if we don't already have secret/orderId and it's the first mount call
         if (planId && duration && !clientSecret && !orderId && isInitialMount.current) {

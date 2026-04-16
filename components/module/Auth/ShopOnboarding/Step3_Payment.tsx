@@ -184,13 +184,8 @@ export default function Step3_Payment({ onPrev, data }: any) {
             .then((intentRes: any) => {
                 console.log("Intent Initialization Success:", intentRes);
                 if (intentRes.success) {
-                    if (intentRes.data?.trialStarted) {
-                        toast.success(intentRes.data.message || "Trial started!");
-                        router.push("/user/dashboard");
-                    } else {
-                        setClientSecret(intentRes.data?.clientSecret);
-                        setOrderId(intentRes.data?.orderId);
-                    }
+                    setClientSecret(intentRes.data?.clientSecret);
+                    setOrderId(intentRes.data?.orderId);
                 }
             })
             .catch((err: any) => {
