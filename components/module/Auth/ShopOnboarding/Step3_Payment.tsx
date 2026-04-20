@@ -5,7 +5,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { useCreateSubscriptionIntentMutation, useConfirmPaymentMutation } from "@/redux/api/paymentApi";
 import { toast } from "sonner";
-import { ShieldCheck, Loader2, CheckCircle2, ChevronLeft } from "lucide-react";
+import { ShieldCheck, Loader2, CheckCircle2, ChevronLeft, AlertTriangle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAppSelector } from "@/redux/hooks";
 
@@ -42,20 +42,18 @@ function CheckoutForm({ clientSecret, orderId, planName, amount, onPrev, isTrial
 
         try {
             let result: any;
-            
-            if (isTrial) {
-                // For $0 trials, confirm SetupIntent to save the card
+
+            // Check the prefix of the clientSecret to determine intent type
+            // seti_ = SetupIntent (trials), pi_ = PaymentIntent (regular payments)
+            const isSetupIntent = clientSecret.startsWith('seti_');
+
+            if (isSetupIntent) {
                 result = await stripe.confirmCardSetup(clientSecret, {
-                    payment_method: {
-                        card: cardElement,
-                    },
+                    payment_method: { card: cardElement },
                 });
             } else {
-                // For regular payments, confirm PaymentIntent
                 result = await stripe.confirmCardPayment(clientSecret, {
-                    payment_method: {
-                        card: cardElement,
-                    },
+                    payment_method: { card: cardElement },
                 });
             }
 
@@ -64,13 +62,19 @@ function CheckoutForm({ clientSecret, orderId, planName, amount, onPrev, isTrial
             if (error) {
                 toast.error(error.message || "Confirmation failed", { id: toastId });
                 setIsProcessing(false);
-            } else if ((paymentIntent && paymentIntent.status === "succeeded") || (setupIntent && setupIntent.status === "succeeded")) {
+            } else if (
+                (paymentIntent && paymentIntent.status === "succeeded") ||
+                (setupIntent && setupIntent.status === "succeeded")
+            ) {
                 await confirmPayment({
                     paymentId: orderId,
                     paymentIntentId: paymentIntent?.id || setupIntent?.id
                 }).unwrap();
 
-                toast.success(isTrial ? "Free trial started successfully!" : "Subscription activated successfully!", { id: toastId });
+                toast.success(
+                    isTrial ? "Free trial started successfully!" : "Subscription activated successfully!",
+                    { id: toastId }
+                );
                 router.push("/user/dashboard");
             }
         } catch (err: any) {
@@ -84,7 +88,7 @@ function CheckoutForm({ clientSecret, orderId, planName, amount, onPrev, isTrial
             <form onSubmit={handleSubmit} className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-xl shadow-blue-500/5 relative overflow-hidden group">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50/50 rounded-bl-full -mr-16 -mt-16 transition-transform group-hover:scale-110" />
-                    
+
                     <h3 className="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
                         <ShieldCheck size={16} />
                         Secure Card Details
@@ -98,13 +102,9 @@ function CheckoutForm({ clientSecret, orderId, planName, amount, onPrev, isTrial
                                         fontSize: "16px",
                                         color: "#0a1628",
                                         fontFamily: '"Outfit", sans-serif',
-                                        "::placeholder": {
-                                            color: "#94a3b8",
-                                        },
+                                        "::placeholder": { color: "#94a3b8" },
                                     },
-                                    invalid: {
-                                        color: "#ef4444",
-                                    },
+                                    invalid: { color: "#ef4444" },
                                 },
                             }}
                         />
@@ -116,8 +116,8 @@ function CheckoutForm({ clientSecret, orderId, planName, amount, onPrev, isTrial
                             <p className="text-3xl font-black text-[#0a1628] tracking-tighter">${amount}</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1 leading-none">Plan Selected</p>
-                          <p className="text-sm font-black text-[#0a1628]">{planName}</p>
+                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1 leading-none">Plan Selected</p>
+                            <p className="text-sm font-black text-[#0a1628]">{planName}</p>
                         </div>
                     </div>
                 </div>
@@ -129,11 +129,11 @@ function CheckoutForm({ clientSecret, orderId, planName, amount, onPrev, isTrial
                 >
                     {isProcessing ? (
                         <>
-                            <Loader2 className="animate-spin" /> 
+                            <Loader2 className="animate-spin" />
                             Activating...
                         </>
                     ) : (
-                        `Activate ${planName} Plan`
+                        isTrial ? `Start Free Trial` : `Activate ${planName} Plan`
                     )}
                 </button>
 
@@ -149,9 +149,13 @@ function CheckoutForm({ clientSecret, orderId, planName, amount, onPrev, isTrial
                 </div>
 
                 <div className="flex justify-center pt-2">
-                  <button type="button" onClick={onPrev} className="text-[9px] font-black text-gray-400 hover:text-[#0a1628] uppercase tracking-[0.2em] transition-colors flex items-center gap-2">
-                    <ChevronLeft size={14} /> Back to Plan Selection
-                  </button>
+                    <button
+                        type="button"
+                        onClick={onPrev}
+                        className="text-[9px] font-black text-gray-400 hover:text-[#0a1628] uppercase tracking-[0.2em] transition-colors flex items-center gap-2"
+                    >
+                        <ChevronLeft size={14} /> Back to Plan Selection
+                    </button>
                 </div>
             </form>
         </div>
@@ -162,44 +166,49 @@ export default function Step3_Payment({ onPrev, data }: any) {
     const [isInitializing, setIsInitializing] = useState(true);
     const [clientSecret, setClientSecret] = useState("");
     const [orderId, setOrderId] = useState("");
+    const [initError, setInitError] = useState("");
     const user = useAppSelector((state) => state.auth.user);
-    const router = useRouter();
     const hasInitialized = useRef(false);
-    const token = useAppSelector((state) => state.auth.token);
     const [createIntent] = useCreateSubscriptionIntentMutation();
 
     useEffect(() => {
         if (data.selectedPlan && !clientSecret && !orderId && !hasInitialized.current) {
             hasInitialized.current = true;
             const activePlanId = data.selectedPlan.id || data.selectedPlan._id;
-            
+
             setIsInitializing(true);
-            console.log("Initializing Subscription Intent...", { activePlanId, duration: data.billingCycle });
-            
+
             createIntent({
                 planId: activePlanId,
                 duration: data.billingCycle
             })
             .unwrap()
             .then((intentRes: any) => {
-                console.log("Intent Initialization Success:", intentRes);
-                if (intentRes.success) {
-                    setClientSecret(intentRes.data?.clientSecret);
-                    setOrderId(intentRes.data?.orderId);
+                if (intentRes.success && intentRes.data?.clientSecret) {
+                    setClientSecret(intentRes.data.clientSecret);
+                    setOrderId(intentRes.data.orderId);
+                } else {
+                    // clientSecret is null — backend returned success but no secret
+                    setInitError(
+                        intentRes.message ||
+                        "Could not initialize payment. You may already have an active subscription."
+                    );
                 }
             })
             .catch((err: any) => {
-                console.error("Intent Initialization Failed:", err);
-                hasInitialized.current = false; // Allow retry on failure
-                toast.error(err?.data?.message || "Failed to initialize payment session");
+                hasInitialized.current = false;
+                const msg = err?.data?.message || "Failed to initialize payment session";
+                setInitError(msg);
+                toast.error(msg);
             })
             .finally(() => {
                 setIsInitializing(false);
             });
         }
-    }, [data.selectedPlan, data.billingCycle, createIntent, clientSecret, orderId, router]);
+    }, [data.selectedPlan, data.billingCycle, createIntent, clientSecret, orderId]);
 
     const amount = data.selectedPlan?.prices.find((p: any) => p.duration === data.billingCycle)?.price || 0;
+    const isTrial = data.selectedPlan?.category === "PROFESSIONAL" && !user?.isTrialUsed;
 
     return (
         <Elements stripe={stripePromise}>
@@ -207,24 +216,34 @@ export default function Step3_Payment({ onPrev, data }: any) {
                 {isInitializing && (
                     <div className="absolute inset-0 z-50 bg-white/90 backdrop-blur-sm rounded-3xl flex flex-col items-center justify-center">
                         <Loader2 className="animate-spin h-12 w-12 text-[#0a1628]" />
-                        <p className="mt-4 text-[#0a1628] font-black uppercase tracking-widest text-xs">Initializing Secure Checkout...</p>
+                        <p className="mt-4 text-[#0a1628] font-black uppercase tracking-widest text-xs">
+                            Initializing Secure Checkout...
+                        </p>
                     </div>
                 )}
 
                 {!isInitializing && clientSecret ? (
-                    <CheckoutForm 
-                        clientSecret={clientSecret} 
-                        orderId={orderId} 
-                        planName={data.selectedPlan?.name} 
+                    <CheckoutForm
+                        clientSecret={clientSecret}
+                        orderId={orderId}
+                        planName={data.selectedPlan?.name}
                         amount={amount}
                         onPrev={onPrev}
-                        isTrial={data.selectedPlan?.category === "PROFESSIONAL" && !user?.isTrialUsed}
+                        isTrial={isTrial}
                     />
                 ) : (
                     !isInitializing && (
                         <div className="text-center p-12 bg-gray-50 rounded-3xl border border-dashed border-gray-200">
-                             <p className="text-gray-400 font-bold mb-4 tracking-widest uppercase text-xs">Checkout could not be initialized</p>
-                             <button onClick={onPrev} className="bg-[#0a1628] text-white px-8 py-3 rounded-xl font-bold uppercase text-xs tracking-widest">Go Back</button>
+                            <AlertTriangle className="mx-auto mb-4 text-amber-500" size={32} />
+                            <p className="text-gray-600 font-bold mb-2 tracking-widest uppercase text-xs">
+                                {initError || "Checkout could not be initialized"}
+                            </p>
+                            <button
+                                onClick={onPrev}
+                                className="mt-4 bg-[#0a1628] text-white px-8 py-3 rounded-xl font-bold uppercase text-xs tracking-widest"
+                            >
+                                Go Back
+                            </button>
                         </div>
                     )
                 )}
