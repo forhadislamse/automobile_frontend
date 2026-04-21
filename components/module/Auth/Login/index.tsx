@@ -7,9 +7,10 @@ import { useLoginMutation } from "@/redux/api/authApi";
 import { setUser } from "@/redux/features/authSlice";
 import { useAppDispatch } from "@/redux/hooks";
 
-import { setCookie } from "@/src/utils/cookies";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { jwtDecode, JwtPayload } from "jwt-decode";
+import Cookies from "js-cookie";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -54,6 +55,7 @@ const LoginPage = () => {
       if (res.success) {
         const { token, refreshToken, ...userProps } = res.data;
 
+
         const user = {
           id: userProps.id,
           email: userProps.email,
@@ -62,7 +64,7 @@ const LoginPage = () => {
           profileImage: userProps.profileImage,
         };
 
-        setCookie(token);
+        Cookies.set("token", token, { expires: 7 }); // Set cookie on client side
         dispatch(setUser({ token, user }));
 
         toast.success(res.message || "Login successful!");
