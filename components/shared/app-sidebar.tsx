@@ -42,6 +42,25 @@ const data = {
       },
     ],
   },
+  technician: {
+    navMain: [
+      {
+        title: "AI Diagnostics",
+        url: "/user/diagnostics",
+        icon: Search,
+      },
+      {
+        title: "Account Management",
+        url: "/user/dashboard/profile",
+        icon: User,
+      },
+      {
+        title: "Go Back To Home",
+        url: "/",
+        icon: Home,
+      },
+    ],
+  },
   admin: {
     navMain: [
       {

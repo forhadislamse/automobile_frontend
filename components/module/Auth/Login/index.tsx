@@ -69,6 +69,10 @@ const LoginPage = () => {
 
         if (user.role === "ADMIN") {
           router.push("/admin/dashboard");
+        } else if (user.role === "TECHNICIAN") {
+          router.push("/user/diagnostics");
+        } else if (user.role === "USER") {
+          router.push("/user");
         } else {
           router.push("/");
         }
