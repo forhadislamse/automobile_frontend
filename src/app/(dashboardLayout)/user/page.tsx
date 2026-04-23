@@ -1,3 +1,5 @@
+"use client";
+
 import OwnerDashboard from "@/components/module/Dashboard/Owner";
 import { useAppSelector } from "@/redux/hooks";
 import { useDecodedToken } from "@/src/hooks/useDecodedToken";

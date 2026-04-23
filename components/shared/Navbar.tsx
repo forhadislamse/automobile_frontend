@@ -71,7 +71,7 @@ const Navbar = () => {
                     {isLoading ? (
                         <div className="w-24 md:w-32 h-10 md:h-12 bg-white/5 animate-pulse rounded-full" />
                     ) : user ? (
-                        <Link href={user.role === "ADMIN" ? "/admin/dashboard" : "/dashboard"}>
+                        <Link href={user.role === "ADMIN" ? "/admin/dashboard" : user.role === "TECHNICIAN" ? "/user/diagnostics" : "/user"}>
                              <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-6 md:px-10 py-4 md:py-6 font-black flex items-center gap-2 text-[12px] md:text-[13px] uppercase tracking-widest shadow-xl shadow-blue-600/20 active:scale-95 transition-all">
                                 Go to Dashboard <ArrowUpRight className="w-4 h-4" />
                              </Button>

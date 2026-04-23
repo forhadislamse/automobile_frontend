@@ -62,7 +62,7 @@ const DiagnosticChat = () => {
     try {
       const imageUrl = await uploadAndGetUrl();
       const res = await startChat({
-        persona: "Shop Foreman AI",
+        persona: "shop_foreman_gpt",
         prompt: message,
         image: imageUrl || undefined,
       }).unwrap() as any;
