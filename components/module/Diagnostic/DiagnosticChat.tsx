@@ -198,9 +198,6 @@ const DiagnosticChat = () => {
                 <h3 className="font-semibold text-blue-900">
                     {activeSession ? activeSession.title : "New Diagnostic Session"}
                 </h3>
-                <p className="text-xs text-blue-400">
-                    {activeSession ? formatPersonaName(activeSession.persona) : "Select a topic to start"}
-                </p>
              </div>
           </div>
         </div>
