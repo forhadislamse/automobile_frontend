@@ -12,11 +12,22 @@ import {
 import { Search, Plus, Send, Image as ImageIcon, Loader2, User, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 // import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
+import ReactMarkdown from "react-markdown";
+
+const formatPersonaName = (persona: string) => {
+  if (!persona) return "";
+  return persona
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
+    .replace('Gpt', 'AI');
+};
 
 const DiagnosticChat = () => {
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
@@ -70,7 +81,11 @@ const DiagnosticChat = () => {
       setMessage("");
       setSelectedFile(null);
       setPreviewUrl(null);
-    } catch (err) {
+    } catch (err: any) {
+      const errorMessage = err.data?.message || "Failed to start diagnostic session. Please check your subscription.";
+      toast.error(errorMessage, {
+        duration: 5000,
+      });
       console.error("Failed to start chat:", err);
     }
   };
@@ -87,7 +102,9 @@ const DiagnosticChat = () => {
       setMessage("");
       setSelectedFile(null);
       setPreviewUrl(null);
-    } catch (err) {
+    } catch (err: any) {
+      const errorMessage = err.data?.message || "Failed to send message.";
+      toast.error(errorMessage);
       console.error("Failed to send message:", err);
     }
   };
@@ -182,7 +199,7 @@ const DiagnosticChat = () => {
                     {activeSession ? activeSession.title : "New Diagnostic Session"}
                 </h3>
                 <p className="text-xs text-blue-400">
-                    {activeSession ? activeSession.persona : "Select a topic to start"}
+                    {activeSession ? formatPersonaName(activeSession.persona) : "Select a topic to start"}
                 </p>
              </div>
           </div>
@@ -235,8 +252,10 @@ const DiagnosticChat = () => {
                             ? "bg-blue-600 text-white rounded-tr-none" 
                             : "bg-gray-50 text-gray-800 rounded-tl-none border border-gray-100"
                         )}>
-                          <div className="text-sm leading-relaxed whitespace-pre-wrap">
-                            {msg.content}
+                          <div className="text-sm leading-relaxed prose prose-sm max-w-none prose-p:leading-relaxed prose-pre:bg-gray-800 prose-pre:text-white">
+                            <ReactMarkdown>
+                                {msg.content}
+                            </ReactMarkdown>
                           </div>
                           {msg.image && (
                             <img 

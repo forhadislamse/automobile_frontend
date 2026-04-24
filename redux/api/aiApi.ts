@@ -3,7 +3,8 @@ import { baseApi } from "./baseApi";
 
 export const aiApi = baseApi.injectEndpoints({
   endpoints: (builder: any) => ({
-    // Specialized One-off Diagnostic Tools
+    // Specialized One-off Diagnostic Tools (Commented out in favor of dynamic routing via startNewChat)
+    /*
     shopForemanAI: builder.mutation({
       query: (prompt: string) => ({
         url: "/ai/shop-foreman",
@@ -46,6 +47,7 @@ export const aiApi = baseApi.injectEndpoints({
         body: { prompt },
       }),
     }),
+    */
 
     // Chat Session Management (Persistent)
     startNewChat: builder.mutation({
@@ -88,7 +90,7 @@ export const aiApi = baseApi.injectEndpoints({
     // Upload images for chat (Corrected Route)
     uploadImages: builder.mutation({
       query: (formData: FormData) => ({
-        url: "/chat-image/upload-images",
+        url: "/chat-images/upload-images",
         method: "POST",
         body: formData,
       }),
@@ -97,12 +99,12 @@ export const aiApi = baseApi.injectEndpoints({
 });
 
 export const {
-  useShopForemanAIMutation,
-  useMechanicalDiagnosticsAIMutation,
-  useObd2InterpreterAIMutation,
-  useElectricalDiagnosticsAIMutation,
-  useTransmissionDiagnosticsAIMutation,
-  useEuropeanSpecialistAIMutation,
+  // useShopForemanAIMutation,
+  // useMechanicalDiagnosticsAIMutation,
+  // useObd2InterpreterAIMutation,
+  // useElectricalDiagnosticsAIMutation,
+  // useTransmissionDiagnosticsAIMutation,
+  // useEuropeanSpecialistAIMutation,
   useStartNewChatMutation,
   useSendMessageMutation,
   useGetMySessionsQuery,

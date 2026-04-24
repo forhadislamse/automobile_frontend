@@ -110,8 +110,8 @@ export function NavUser() {
                 <span className="truncate font-semibold">
                   {data?.data?.fullName || "User"}
                 </span>
-                <span className="truncate text-xs">
-                  {data?.data?.email || "No email"}
+                <span className="truncate text-xs font-medium text-blue-500">
+                  {data?.data?.plan?.name || (data?.data?.role === 'TECHNICIAN' ? "Technician" : "Free Plan")}
                 </span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
@@ -145,8 +145,8 @@ export function NavUser() {
                   <span className="truncate font-semibold">
                     {data?.data?.fullName || "User"}
                   </span>
-                  <span className="truncate text-xs">
-                    {data?.data?.email || "No email"}
+                  <span className="truncate text-xs font-medium text-blue-500">
+                    {data?.data?.plan?.name || (data?.data?.role === 'TECHNICIAN' ? "Technician" : "Free Plan")}
                   </span>
                 </div>
               </div>
