@@ -6,7 +6,7 @@ const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:13079/api/
 
 const baseQueryWithAuth: ReturnType<typeof fetchBaseQuery> = async (
   args,
-  api,
+  api, 
   extraOptions
 ) => {
   const rawBaseQuery = fetchBaseQuery({
