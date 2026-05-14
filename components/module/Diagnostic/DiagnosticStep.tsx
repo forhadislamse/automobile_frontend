@@ -1,25 +1,27 @@
 "use client";
 
 import React from "react";
-import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, AlertCircle, Info, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface DiagnosticData {
-  vehicle: string;
-  concern: string;
-  system_focus: string;
-  current_assessment: string;
-  step_number: number;
-  step_title: string;
-  instruction: string;
-  what_to_check: string;
-  response_options: string[];
-  state_action: string;
-  full_text_response: string;
+  vehicle?: string;
+  concern?: string;
+  system_focus?: string;
+  current_assessment?: string;
+  step_number?: number;
+  step_title?: string;
+  instruction?: string;
+  what_to_check?: string;
+  response_options?: string[];
+  state_action?: string;
+  full_text_response?: string;
+  status?: string;
+  message?: string;
+  reason?: string;
+  accepted?: boolean;
+  expected_response_options?: string[];
 }
 
 interface DiagnosticStepProps {
@@ -34,89 +36,125 @@ const DiagnosticStep: React.FC<DiagnosticStepProps> = ({ content, onOptionSelect
   try {
     data = JSON.parse(content);
   } catch (e) {
-    // Fallback if content is not JSON (legacy support)
     return (
-      <div className="text-sm leading-relaxed prose prose-sm max-w-none">
+      <div className="text-[15px] leading-relaxed text-slate-600 font-medium">
         <ReactMarkdown>{content}</ReactMarkdown>
       </div>
+    );
+  }
+
+  // Specialized State: Confirm Switch
+  if (data.status === 'confirm_switch') {
+    return (
+      <div className="py-4 border-l-2 border-amber-400 pl-6 space-y-3">
+        <span className="font-bold uppercase tracking-widest text-[10px] text-amber-600">Action Required</span>
+        <p className="text-[15px] text-slate-700 font-medium leading-relaxed">{data.message}</p>
+        {isLatest && (
+          <div className="flex gap-2 pt-1">
+            <Button 
+                onClick={() => onOptionSelect("Switch")}
+                className="bg-slate-900 text-white rounded-full px-6 h-9 text-sm font-semibold hover:bg-slate-800"
+            >
+                Yes, Switch
+            </Button>
+            <Button 
+                onClick={() => onOptionSelect("Continue")}
+                variant="ghost"
+                className="text-slate-500 rounded-full px-6 h-9 text-sm font-semibold hover:bg-slate-100"
+            >
+                Continue
+            </Button>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Specialized State: Invalid Input
+  if (data.status === 'INVALID_INPUT' || data.accepted === false) {
+    return (
+        <div className="py-4 border-l-2 border-rose-400 pl-6 space-y-2">
+          <span className="font-bold uppercase tracking-widest text-[10px] text-rose-500">Validation Error</span>
+          <div className="space-y-1">
+            <h4 className="font-semibold text-slate-900 text-base">{data.reason || "Invalid Selection"}</h4>
+            <p className="text-[14px] text-slate-500 font-medium leading-relaxed">{data.message}</p>
+          </div>
+          {data.expected_response_options && (
+            <div className="flex flex-wrap gap-2 pt-2">
+                {data.expected_response_options.map((opt: string) => (
+                    <span key={opt} className="px-3 py-1 bg-slate-50 border border-slate-100 text-[10px] font-bold text-slate-400 rounded-full uppercase tracking-wider">
+                        {opt}
+                    </span>
+                ))}
+            </div>
+          )}
+        </div>
     );
   }
 
   const isConclusion = data.state_action === "final_conclusion";
 
   return (
-    <div className="space-y-4 w-full">
-      {/* Main Narrative - AI's reasoning */}
-      <div className="text-sm leading-relaxed prose prose-sm max-w-none text-gray-700">
-        <ReactMarkdown>{data.full_text_response}</ReactMarkdown>
+    <div className="space-y-6 py-2 w-full">
+      {/* Header Info - Clean Text */}
+      <div className="flex flex-wrap gap-x-6 gap-y-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+        <span>Vehicle: <span className="text-slate-500">{data.vehicle || "N/A"}</span></span>
+        <span>Concern: <span className="text-slate-500">{data.concern || "N/A"}</span></span>
       </div>
 
-      {/* Action Card - The specific instruction */}
-      {!isConclusion && (
-        <Card className="border-l-4 border-l-blue-600 bg-blue-50/50 p-4 shadow-sm">
-          <div className="flex items-start gap-3">
-            <div className="p-2 bg-blue-100 rounded-lg text-blue-600">
-              <Info className="w-5 h-5" />
+      {/* Main Content Area */}
+      <div className="space-y-4">
+        <div className="space-y-2">
+            <h3 className="text-lg font-semibold text-slate-900 leading-tight tracking-tight">
+                {data.step_title || "Technical Assessment"}
+            </h3>
+            <div className="text-[15px] text-slate-600 leading-relaxed max-w-3xl font-medium">
+                <ReactMarkdown>{data.current_assessment || data.full_text_response || ""}</ReactMarkdown>
             </div>
-            <div className="space-y-1">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-blue-600">
-                Step {data.step_number}: {data.step_title}
-              </h4>
-              <p className="text-sm font-semibold text-blue-900 leading-snug">
+        </div>
+      </div>
+
+      {/* Instruction Section */}
+      {!isConclusion && data.instruction && (
+        <div className="py-6 border-y border-slate-50 space-y-4">
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-500">Required Action</span>
+            <p className="text-xl font-medium text-slate-900 leading-snug tracking-tight">
                 {data.instruction}
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-3 ml-11 border-t border-blue-100 pt-3">
-            <div className="flex items-center gap-2 text-xs font-medium text-blue-700">
-              <AlertCircle className="w-3.5 h-3.5" />
-              <span>What to check:</span>
-            </div>
-            <p className="text-xs text-blue-600 mt-1">{data.what_to_check}</p>
-          </div>
-        </Card>
+            </p>
+            {data.what_to_check && (
+                <p className="text-sm font-medium italic text-slate-400">{data.what_to_check}</p>
+            )}
+        </div>
       )}
 
-      {/* Final Conclusion Card */}
+      {/* Conclusion Style */}
       {isConclusion && (
-        <Card className="border-l-4 border-l-emerald-600 bg-emerald-50/50 p-4 shadow-md border-emerald-100">
-          <div className="flex items-start gap-3">
-            <div className="p-2 bg-emerald-100 rounded-lg text-emerald-600">
-              <CheckCircle2 className="w-5 h-5" />
-            </div>
-            <div>
-              <h4 className="text-xs font-bold uppercase tracking-wider text-emerald-600">
-                Diagnostic Confirmed
-              </h4>
-              <p className="text-sm font-bold text-emerald-900 mt-1">
-                Root cause identified through testing.
-              </p>
-            </div>
-          </div>
-        </Card>
+        <div className="py-8 border-t-2 border-emerald-400 space-y-2">
+            <h4 className="text-xl font-semibold tracking-tight text-emerald-600">Diagnosis Confirmed</h4>
+            <p className="text-[16px] text-slate-600 font-medium leading-relaxed max-w-2xl">The root cause has been isolated and verified through technical testing.</p>
+        </div>
       )}
 
-      {/* Response Options - Interactive Buttons */}
-      {isLatest && !isConclusion && data.response_options.length > 0 && (
-        <motion.div 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex flex-wrap gap-2 pt-2"
-        >
-          {data.response_options.map((option, idx) => (
-            <Button
-              key={idx}
-              variant="outline"
-              size="sm"
-              onClick={() => onOptionSelect(option)}
-              className="bg-white border-blue-200 text-blue-700 hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all rounded-full px-4 group"
-            >
-              <span>{option}</span>
-              <ArrowRight className="w-3 h-3 ml-2 opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
-            </Button>
-          ))}
-        </motion.div>
+      {/* Response Options */}
+      {isLatest && !isConclusion && data.response_options && data.response_options.length > 0 && (
+        <div className="space-y-4 pt-4">
+            <p className="text-[10px] font-bold text-slate-300 uppercase tracking-[0.2em]">Test Results</p>
+            <div className="flex flex-wrap gap-2">
+            {data.response_options.map((option: string) => (
+                <Button
+                key={option}
+                onClick={() => onOptionSelect(option)}
+                variant="outline"
+                className={cn(
+                    "h-auto py-3 px-8 rounded-full border-slate-200 font-semibold text-[14px] transition-all",
+                    "hover:bg-slate-900 hover:border-slate-900 hover:text-white text-slate-600"
+                )}
+                >
+                {option}
+                </Button>
+            ))}
+            </div>
+        </div>
       )}
     </div>
   );
