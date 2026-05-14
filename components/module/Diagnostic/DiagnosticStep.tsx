@@ -43,22 +43,35 @@ const DiagnosticStep: React.FC<DiagnosticStepProps> = ({ content, onOptionSelect
     );
   }
 
-  // Specialized State: Gemini Style Alerts
-  if (data.status === 'confirm_switch' || data.status === 'INVALID_INPUT' || data.accepted === false) {
+  // Specialized State: Gemini Style Alerts (Confirm Switch / Plan Locked / Invalid Input)
+  if (data.status === 'confirm_switch' || data.status === 'PLAN_LOCKED' || data.status === 'INVALID_INPUT' || data.accepted === false) {
     const isError = data.status === 'INVALID_INPUT' || data.accepted === false;
+    const isLocked = data.status === 'PLAN_LOCKED';
+    
     return (
       <div className={cn(
         "py-5 px-6 border-l-4 rounded-r-2xl space-y-3 my-4",
+        isLocked ? "border-slate-900 bg-slate-50" : 
         isError ? "border-rose-500 bg-rose-50/50" : "border-amber-400 bg-amber-50/50"
       )}>
-        <p className="text-[15px] text-slate-800 font-medium leading-relaxed">
+        <p className={cn(
+            "text-[15px] leading-relaxed",
+            isLocked ? "text-slate-900 font-semibold" : "text-slate-800 font-medium"
+        )}>
             {data.message || data.reason}
         </p>
+        
         {isLatest && data.status === 'confirm_switch' && (
           <div className="flex gap-3 pt-2">
             <Button onClick={() => onOptionSelect("Switch")} className="bg-slate-900 text-white rounded-full px-6 h-9 text-sm font-medium">Yes, Switch</Button>
             <Button onClick={() => onOptionSelect("Continue")} variant="ghost" className="text-slate-500 rounded-full px-6 h-9 text-sm font-medium">Continue</Button>
           </div>
+        )}
+
+        {isLocked && (
+            <div className="pt-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                Contact Shop Admin for Upgrade
+            </div>
         )}
       </div>
     );
