@@ -65,6 +65,18 @@ const DiagnosticChat = () => {
   const sessions = (sessionsRes as any)?.data || [];
   const messages = (messagesRes as any)?.data || [];
 
+  // Validate stored session ID against actual sessions list
+  // If sessions are loaded and stored ID doesn't exist, clear it
+  useEffect(() => {
+    if (!sessionsLoading && sessions.length >= 0 && activeSessionId) {
+      const exists = sessions.some((s: any) => s.id === activeSessionId);
+      if (!exists && sessions.length > 0) {
+        // Session no longer exists — clear stale localStorage
+        handleSetSessionId(null);
+      }
+    }
+  }, [sessions, sessionsLoading]);
+
   const [startChat, { isLoading: startingChat }] = useStartNewChatMutation();
   const [sendMessage, { isLoading: sendingMessage }] = useSendMessageMutation();
   const [uploadImages, { isLoading: uploading }] = useUploadImagesMutation();
@@ -126,7 +138,13 @@ const DiagnosticChat = () => {
       setSelectedFile(null);
       setPreviewUrl(null);
     } catch (err: any) {
-      toast.error("Failed to send message.");
+      // If session no longer exists, clear stale ID and retry as new chat
+      if (err?.status === 404 || err?.data?.statusCode === 404) {
+        handleSetSessionId(null);
+        toast.error("Session expired. Starting new diagnostic.");
+      } else {
+        toast.error(err?.data?.message || "Failed to send message.");
+      }
     }
   };
 
