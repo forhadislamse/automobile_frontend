@@ -9,6 +9,7 @@ import {
   Loader2, 
   ArrowRight, 
   Check, 
+  Lock,
   ShieldCheck, 
   Sparkles,
   Zap,
@@ -19,6 +20,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useAppSelector } from "@/redux/hooks";
 import { useGetMeQuery } from "@/redux/api/authApi";
 import Logo from "@/src/assets/logo2.png";
+
+interface PlanFeature {
+  name: string;
+  isActive: boolean;
+}
 
 // --- PRICING CARD COMPONENT (Individual Toggle) ---
 const PricingCard = ({ plan, user }: { plan: any, user: any }) => {
@@ -97,15 +103,31 @@ const PricingCard = ({ plan, user }: { plan: any, user: any }) => {
                 </Link>
 
                 <ul className="space-y-4 text-left">
-                    {plan.features.map((feature: string, idx: number) => (
-                        <li key={idx} className="flex items-start gap-4">
+                    {plan.baseIncludedText && (
+                        <li className={`flex gap-4 items-center p-4 rounded-3xl border mb-4 ${
+                            isCenter ? "bg-white/10 border-white/20" : "bg-blue-50 border-blue-100"
+                        }`}>
+                            <Sparkles className={`w-5 h-5 ${isCenter ? "text-blue-300" : "text-blue-600"}`} />
+                            <span className={`text-sm font-black uppercase tracking-wider ${isCenter ? "text-white" : "text-blue-700"}`}>
+                                {plan.baseIncludedText}
+                            </span>
+                        </li>
+                    )}
+                    {plan.features.map((feature: PlanFeature, idx: number) => (
+                        <li key={idx} className={`flex items-start gap-4 ${!feature.isActive && "opacity-40"}`}>
                             <div className={`mt-0.5 flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${
-                                isCenter ? "bg-white/10" : "bg-blue-50"
+                                isCenter ? (feature.isActive ? "bg-white/20" : "bg-white/10") : (feature.isActive ? "bg-blue-50" : "bg-gray-100")
                             }`}>
-                                <Check className={`w-3.5 h-3.5 ${isCenter ? "text-white" : "text-blue-600"}`} strokeWidth={3} />
+                                {feature.isActive ? (
+                                    <Check className={`w-3.5 h-3.5 ${isCenter ? "text-white" : "text-blue-600"}`} strokeWidth={3} />
+                                ) : (
+                                    <Lock className={`w-3 h-3 ${isCenter ? "text-blue-200" : "text-gray-400"}`} />
+                                )}
                             </div>
-                            <span className={`text-[15px] font-bold ${isCenter ? "text-blue-50" : "text-gray-600"}`}>
-                                {feature}
+                            <span className={`text-[15px] font-bold ${
+                                isCenter ? (feature.isActive ? "text-blue-50" : "text-blue-200/50") : (feature.isActive ? "text-gray-600" : "text-gray-400")
+                            }`}>
+                                {feature.name}
                             </span>
                         </li>
                     ))}

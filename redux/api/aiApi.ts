@@ -56,7 +56,7 @@ export const aiApi = baseApi.injectEndpoints({
         method: "POST",
         body: payload,
       }),
-      invalidatesTags: ["AI"],
+      invalidatesTags: [{ type: "AI", id: "LIST" }],
     }),
 
     sendMessage: builder.mutation({
@@ -65,7 +65,10 @@ export const aiApi = baseApi.injectEndpoints({
         method: "POST",
         body: payload,
       }),
-      invalidatesTags: ["AI"],
+      invalidatesTags: (result: any, error: any, { sessionId }: any) => [
+        { type: "AI", id: "LIST" },
+        { type: "AI", id: sessionId },
+      ],
     }),
 
     getMySessions: builder.query({
@@ -74,7 +77,7 @@ export const aiApi = baseApi.injectEndpoints({
         method: "GET",
         params: searchTerm ? { searchTerm } : {},
       }),
-      providesTags: ["AI"],
+      providesTags: [{ type: "AI", id: "LIST" }],
     }),
 
     getChatMessages: builder.query({

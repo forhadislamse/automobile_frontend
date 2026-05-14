@@ -19,6 +19,7 @@ import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
+import DiagnosticStep from "./DiagnosticStep";
 
 const formatPersonaName = (persona: string) => {
   if (!persona) return "";
@@ -90,13 +91,27 @@ const DiagnosticChat = () => {
     }
   };
 
+  const handleOptionSelect = (option: string) => {
+    setMessage(option);
+    setTimeout(() => {
+        if (activeSessionId) {
+            handleSendMessageInternal(option);
+        }
+    }, 100);
+  };
+
   const handleSendMessage = async () => {
-    if ((!message.trim() && !selectedFile) || !activeSessionId) return;
+    await handleSendMessageInternal();
+  };
+
+  const handleSendMessageInternal = async (overrideMessage?: string) => {
+    const finalMessage = overrideMessage || message;
+    if ((!finalMessage.trim() && !selectedFile) || !activeSessionId) return;
     try {
       const imageUrl = await uploadAndGetUrl();
       await sendMessage({
         sessionId: activeSessionId,
-        prompt: message,
+        prompt: finalMessage,
         image: imageUrl || undefined,
       }).unwrap();
       setMessage("");
@@ -217,10 +232,10 @@ const DiagnosticChat = () => {
                 </div>
             )}
 
-            {(messagesLoading || startingChat) ? (
+            {(messagesLoading && messages.length === 0 || startingChat) ? (
                 <div className="flex justify-center pt-10"><Loader2 className="animate-spin text-blue-400 w-8 h-8" /></div>
             ) : (
-                messages.map((msg: any) => (
+                messages.map((msg: any, index: number) => (
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -240,19 +255,28 @@ const DiagnosticChat = () => {
                       </Avatar>
                       
                       <div className={cn(
-                        "max-w-[80%] space-y-2",
-                        msg.role === "user" ? "items-end" : "items-start"
+                        "max-w-[80%] space-y-2 w-full",
+                        msg.role === "user" ? "items-end ml-auto" : "items-start mr-auto"
                       )}>
                         <Card className={cn(
-                          "p-4 rounded-2xl border-none shadow-sm",
+                          "p-4 rounded-2xl border-none shadow-sm w-full",
                           msg.role === "user" 
-                            ? "bg-blue-600 text-white rounded-tr-none" 
-                            : "bg-gray-50 text-gray-800 rounded-tl-none border border-gray-100"
+                            ? "bg-blue-600 text-white rounded-tr-none ml-auto" 
+                            : "bg-white text-gray-800 rounded-tl-none border border-gray-100 mr-auto"
                         )}>
-                          <div className="text-sm leading-relaxed prose prose-sm max-w-none prose-p:leading-relaxed prose-pre:bg-gray-800 prose-pre:text-white">
-                            <ReactMarkdown>
-                                {msg.content}
-                            </ReactMarkdown>
+                          <div className={cn(
+                            "text-sm leading-relaxed",
+                            msg.role === "user" ? "prose-invert" : "prose prose-sm max-w-none"
+                          )}>
+                            {msg.role === "user" ? (
+                                <ReactMarkdown>{msg.content}</ReactMarkdown>
+                            ) : (
+                                <DiagnosticStep 
+                                    content={msg.content} 
+                                    onOptionSelect={handleOptionSelect}
+                                    isLatest={index === messages.length - 1}
+                                />
+                            )}
                           </div>
                           {msg.image && (
                             <img 
@@ -262,7 +286,10 @@ const DiagnosticChat = () => {
                             />
                           )}
                         </Card>
-                        <span className="text-[10px] text-gray-400 px-2">
+                        <span className={cn(
+                          "text-[10px] text-gray-400 px-2 block",
+                          msg.role === "user" ? "text-right" : "text-left"
+                        )}>
                           {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </span>
                       </div>

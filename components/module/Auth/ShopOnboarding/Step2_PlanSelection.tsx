@@ -1,7 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import { Check } from "lucide-react";
+import { Check, Lock, Sparkles } from "lucide-react";
+
+interface PlanFeature {
+  name: string;
+  isActive: boolean;
+}
 
 interface Step2Props {
   plans: any[];
@@ -39,7 +44,7 @@ const PlanCard = ({ plan, onSelect }: { plan: any, onSelect: (plan: any, cycle: 
             Monthly
           </button>
           <button 
-             type="button"
+            type="button"
             onClick={() => setBillingCycle("Annually")}
             className={`px-4 py-1.5 rounded-full text-[11px] font-bold transition-all ${
               billingCycle === "Annually" ? "bg-[#0a1628] text-white shadow-sm" : "text-gray-500"
@@ -68,12 +73,30 @@ const PlanCard = ({ plan, onSelect }: { plan: any, onSelect: (plan: any, cycle: 
       </button>
 
       <ul className="space-y-4 flex-grow">
-        {plan.features.map((feature: string, idx: number) => (
-          <li key={idx} className="flex gap-3">
-            <div className="mt-1 flex-shrink-0 w-5 h-5 rounded-full bg-blue-50 flex items-center justify-center">
-              <Check className="w-3 h-3 text-blue-600" strokeWidth={3} />
+        {plan.baseIncludedText && (
+          <li className="flex gap-3 items-center p-3 bg-blue-50/50 rounded-xl border border-blue-100 mb-2">
+            <Sparkles className="w-4 h-4 text-blue-600" />
+            <span className="text-sm font-black text-blue-700">{plan.baseIncludedText}</span>
+          </li>
+        )}
+        {plan.features.map((feature: PlanFeature, idx: number) => (
+          <li key={idx} className={cn("flex gap-3", !feature.isActive && "opacity-40")}>
+            <div className={cn(
+              "mt-1 flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center",
+              feature.isActive ? "bg-blue-50" : "bg-gray-100"
+            )}>
+              {feature.isActive ? (
+                <Check className="w-3 h-3 text-blue-600" strokeWidth={3} />
+              ) : (
+                <Lock className="w-2.5 h-2.5 text-gray-400" />
+              )}
             </div>
-            <span className="text-sm font-bold text-gray-600">{feature}</span>
+            <span className={cn(
+              "text-sm font-bold",
+              feature.isActive ? "text-gray-600" : "text-gray-400"
+            )}>
+              {feature.name}
+            </span>
           </li>
         ))}
       </ul>
