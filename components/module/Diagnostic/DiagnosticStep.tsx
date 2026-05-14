@@ -70,7 +70,7 @@ const DiagnosticStep: React.FC<DiagnosticStepProps> = ({ content, onOptionSelect
 
         {isLocked && (
             <div className="pt-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">
-                Contact Shop Admin for Upgrade
+                Contact Shop Owner for Upgrade
             </div>
         )}
       </div>
@@ -78,6 +78,7 @@ const DiagnosticStep: React.FC<DiagnosticStepProps> = ({ content, onOptionSelect
   }
 
   const isConclusion = data.state_action === "final_conclusion";
+  const hasDiagnosticStep = data.instruction || data.step_title;
 
   return (
     <div className="w-full space-y-6">
@@ -89,9 +90,11 @@ const DiagnosticStep: React.FC<DiagnosticStepProps> = ({ content, onOptionSelect
           </h2>
         )}
         
-        <div className="text-[16px] text-slate-700 leading-relaxed font-normal prose prose-slate max-w-none">
-          <ReactMarkdown>{data.current_assessment || data.full_text_response || ""}</ReactMarkdown>
-        </div>
+        {(data.current_assessment || data.full_text_response) && (
+          <div className="text-[16px] text-slate-700 leading-relaxed font-normal prose prose-slate max-w-none">
+            <ReactMarkdown>{data.current_assessment || data.full_text_response || ""}</ReactMarkdown>
+          </div>
+        )}
 
         {/* Integrated Instructions */}
         {data.instruction && (
@@ -104,6 +107,13 @@ const DiagnosticStep: React.FC<DiagnosticStepProps> = ({ content, onOptionSelect
                 HELPFUL TIP: {data.what_to_check}
               </p>
             )}
+          </div>
+        )}
+
+        {/* Fallback for simple conversational responses */}
+        {!hasDiagnosticStep && !isConclusion && !data.current_assessment && data.message && (
+          <div className="text-[16px] text-slate-700 leading-relaxed">
+            <ReactMarkdown>{data.message}</ReactMarkdown>
           </div>
         )}
       </div>
