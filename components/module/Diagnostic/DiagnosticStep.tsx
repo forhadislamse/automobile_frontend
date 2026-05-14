@@ -43,15 +43,15 @@ const DiagnosticStep: React.FC<DiagnosticStepProps> = ({ content, onOptionSelect
     );
   }
 
-  // Specialized State: Confirm Switch / Invalid Input (Minimalist Gemini Style)
+  // Specialized State: Gemini Style Alerts
   if (data.status === 'confirm_switch' || data.status === 'INVALID_INPUT' || data.accepted === false) {
     const isError = data.status === 'INVALID_INPUT' || data.accepted === false;
     return (
       <div className={cn(
-        "py-4 border-l-4 pl-6 space-y-3 my-2",
-        isError ? "border-rose-500 bg-rose-50/30" : "border-amber-400 bg-amber-50/30"
+        "py-5 px-6 border-l-4 rounded-r-2xl space-y-3 my-4",
+        isError ? "border-rose-500 bg-rose-50/50" : "border-amber-400 bg-amber-50/50"
       )}>
-        <p className="text-[16px] text-slate-800 font-medium leading-relaxed">
+        <p className="text-[15px] text-slate-800 font-medium leading-relaxed">
             {data.message || data.reason}
         </p>
         {isLatest && data.status === 'confirm_switch' && (
@@ -67,11 +67,11 @@ const DiagnosticStep: React.FC<DiagnosticStepProps> = ({ content, onOptionSelect
   const isConclusion = data.state_action === "final_conclusion";
 
   return (
-    <div className="w-full space-y-6 animate-in fade-in duration-500">
-      {/* Main Text Content - Pure Gemini Style */}
-      <div className="space-y-4">
+    <div className="w-full space-y-6">
+      {/* Main Content Area */}
+      <div className="space-y-5">
         {data.step_title && (
-          <h2 className="text-xl font-semibold text-slate-900 tracking-tight">
+          <h2 className="text-xl font-medium text-slate-900 tracking-tight">
             {data.step_title}
           </h2>
         )}
@@ -80,14 +80,15 @@ const DiagnosticStep: React.FC<DiagnosticStepProps> = ({ content, onOptionSelect
           <ReactMarkdown>{data.current_assessment || data.full_text_response || ""}</ReactMarkdown>
         </div>
 
+        {/* Integrated Instructions */}
         {data.instruction && (
-          <div className="mt-6 pt-6 border-t border-slate-100">
-            <p className="text-[18px] font-medium text-slate-900 leading-relaxed italic">
+          <div className="mt-8 space-y-3">
+            <p className="text-[18px] font-medium text-slate-900 leading-snug">
               {data.instruction}
             </p>
             {data.what_to_check && (
-              <p className="text-sm text-slate-400 mt-2 font-medium">
-                Tip: {data.what_to_check}
+              <p className="text-sm text-slate-400 font-medium tracking-wide">
+                HELPFUL TIP: {data.what_to_check}
               </p>
             )}
           </div>
@@ -96,23 +97,25 @@ const DiagnosticStep: React.FC<DiagnosticStepProps> = ({ content, onOptionSelect
 
       {/* Conclusion Style */}
       {isConclusion && (
-        <div className="py-6 border-t-2 border-emerald-500 mt-8">
-            <h4 className="text-lg font-semibold text-emerald-700">Diagnosis Confirmed</h4>
-            <p className="text-[16px] text-slate-600 mt-1">The system has finalized the assessment.</p>
+        <div className="pt-8 border-t border-slate-100 mt-8">
+            <div className="inline-flex items-center px-4 py-1 bg-emerald-50 text-emerald-700 rounded-full text-[12px] font-bold uppercase tracking-widest mb-3">
+                Final Diagnosis
+            </div>
+            <p className="text-[16px] text-slate-600 leading-relaxed">The assessment has been completed based on the provided technical data.</p>
         </div>
       )}
 
-      {/* Response Options - Clean Gemini Pill Buttons */}
+      {/* Response Options - Minimalist Gemini Buttons */}
       {isLatest && !isConclusion && data.response_options && data.response_options.length > 0 && (
-        <div className="flex flex-wrap gap-3 pt-6 border-t border-slate-50">
+        <div className="flex flex-wrap gap-2.5 pt-8">
           {data.response_options.map((option: string) => (
             <Button
               key={option}
               onClick={() => onOptionSelect(option)}
               variant="outline"
               className={cn(
-                "h-auto py-2.5 px-6 rounded-full border-slate-200 font-medium text-[14px] transition-all duration-300",
-                "hover:bg-slate-900 hover:border-slate-900 hover:text-white text-slate-600 bg-white shadow-sm"
+                "h-auto py-2.5 px-6 rounded-full border-slate-200 font-medium text-[14px] transition-all duration-200",
+                "hover:bg-slate-900 hover:border-slate-900 hover:text-white text-slate-600 bg-white"
               )}
             >
               {option}
