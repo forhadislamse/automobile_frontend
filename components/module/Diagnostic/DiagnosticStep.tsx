@@ -37,123 +37,87 @@ const DiagnosticStep: React.FC<DiagnosticStepProps> = ({ content, onOptionSelect
     data = JSON.parse(content);
   } catch (e) {
     return (
-      <div className="text-[15px] leading-relaxed text-slate-600 font-medium">
+      <div className="text-[16px] leading-relaxed text-slate-700 font-normal">
         <ReactMarkdown>{content}</ReactMarkdown>
       </div>
     );
   }
 
-  // Specialized State: Confirm Switch
-  if (data.status === 'confirm_switch') {
+  // Specialized State: Confirm Switch / Invalid Input (Minimalist Gemini Style)
+  if (data.status === 'confirm_switch' || data.status === 'INVALID_INPUT' || data.accepted === false) {
+    const isError = data.status === 'INVALID_INPUT' || data.accepted === false;
     return (
-      <div className="py-4 border-l-2 border-amber-400 pl-6 space-y-3">
-        <span className="font-bold uppercase tracking-widest text-[10px] text-amber-600">Action Required</span>
-        <p className="text-[15px] text-slate-700 font-medium leading-relaxed">{data.message}</p>
-        {isLatest && (
-          <div className="flex gap-2 pt-1">
-            <Button 
-                onClick={() => onOptionSelect("Switch")}
-                className="bg-slate-900 text-white rounded-full px-6 h-9 text-sm font-semibold hover:bg-slate-800"
-            >
-                Yes, Switch
-            </Button>
-            <Button 
-                onClick={() => onOptionSelect("Continue")}
-                variant="ghost"
-                className="text-slate-500 rounded-full px-6 h-9 text-sm font-semibold hover:bg-slate-100"
-            >
-                Continue
-            </Button>
+      <div className={cn(
+        "py-4 border-l-4 pl-6 space-y-3 my-2",
+        isError ? "border-rose-500 bg-rose-50/30" : "border-amber-400 bg-amber-50/30"
+      )}>
+        <p className="text-[16px] text-slate-800 font-medium leading-relaxed">
+            {data.message || data.reason}
+        </p>
+        {isLatest && data.status === 'confirm_switch' && (
+          <div className="flex gap-3 pt-2">
+            <Button onClick={() => onOptionSelect("Switch")} className="bg-slate-900 text-white rounded-full px-6 h-9 text-sm font-medium">Yes, Switch</Button>
+            <Button onClick={() => onOptionSelect("Continue")} variant="ghost" className="text-slate-500 rounded-full px-6 h-9 text-sm font-medium">Continue</Button>
           </div>
         )}
       </div>
     );
   }
 
-  // Specialized State: Invalid Input
-  if (data.status === 'INVALID_INPUT' || data.accepted === false) {
-    return (
-        <div className="py-4 border-l-2 border-rose-400 pl-6 space-y-2">
-          <span className="font-bold uppercase tracking-widest text-[10px] text-rose-500">Validation Error</span>
-          <div className="space-y-1">
-            <h4 className="font-semibold text-slate-900 text-base">{data.reason || "Invalid Selection"}</h4>
-            <p className="text-[14px] text-slate-500 font-medium leading-relaxed">{data.message}</p>
-          </div>
-          {data.expected_response_options && (
-            <div className="flex flex-wrap gap-2 pt-2">
-                {data.expected_response_options.map((opt: string) => (
-                    <span key={opt} className="px-3 py-1 bg-slate-50 border border-slate-100 text-[10px] font-bold text-slate-400 rounded-full uppercase tracking-wider">
-                        {opt}
-                    </span>
-                ))}
-            </div>
-          )}
-        </div>
-    );
-  }
-
   const isConclusion = data.state_action === "final_conclusion";
 
   return (
-    <div className="space-y-6 py-2 w-full">
-      {/* Header Info - Clean Text */}
-      <div className="flex flex-wrap gap-x-6 gap-y-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">
-        <span>Vehicle: <span className="text-slate-500">{data.vehicle || "N/A"}</span></span>
-        <span>Concern: <span className="text-slate-500">{data.concern || "N/A"}</span></span>
-      </div>
-
-      {/* Main Content Area */}
+    <div className="w-full space-y-6 animate-in fade-in duration-500">
+      {/* Main Text Content - Pure Gemini Style */}
       <div className="space-y-4">
-        <div className="space-y-2">
-            <h3 className="text-lg font-semibold text-slate-900 leading-tight tracking-tight">
-                {data.step_title || "Technical Assessment"}
-            </h3>
-            <div className="text-[15px] text-slate-600 leading-relaxed max-w-3xl font-medium">
-                <ReactMarkdown>{data.current_assessment || data.full_text_response || ""}</ReactMarkdown>
-            </div>
+        {data.step_title && (
+          <h2 className="text-xl font-semibold text-slate-900 tracking-tight">
+            {data.step_title}
+          </h2>
+        )}
+        
+        <div className="text-[16px] text-slate-700 leading-relaxed font-normal prose prose-slate max-w-none">
+          <ReactMarkdown>{data.current_assessment || data.full_text_response || ""}</ReactMarkdown>
         </div>
-      </div>
 
-      {/* Instruction Section */}
-      {!isConclusion && data.instruction && (
-        <div className="py-6 border-y border-slate-50 space-y-4">
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-500">Required Action</span>
-            <p className="text-xl font-medium text-slate-900 leading-snug tracking-tight">
-                {data.instruction}
+        {data.instruction && (
+          <div className="mt-6 pt-6 border-t border-slate-100">
+            <p className="text-[18px] font-medium text-slate-900 leading-relaxed italic">
+              {data.instruction}
             </p>
             {data.what_to_check && (
-                <p className="text-sm font-medium italic text-slate-400">{data.what_to_check}</p>
+              <p className="text-sm text-slate-400 mt-2 font-medium">
+                Tip: {data.what_to_check}
+              </p>
             )}
-        </div>
-      )}
+          </div>
+        )}
+      </div>
 
       {/* Conclusion Style */}
       {isConclusion && (
-        <div className="py-8 border-t-2 border-emerald-400 space-y-2">
-            <h4 className="text-xl font-semibold tracking-tight text-emerald-600">Diagnosis Confirmed</h4>
-            <p className="text-[16px] text-slate-600 font-medium leading-relaxed max-w-2xl">The root cause has been isolated and verified through technical testing.</p>
+        <div className="py-6 border-t-2 border-emerald-500 mt-8">
+            <h4 className="text-lg font-semibold text-emerald-700">Diagnosis Confirmed</h4>
+            <p className="text-[16px] text-slate-600 mt-1">The system has finalized the assessment.</p>
         </div>
       )}
 
-      {/* Response Options */}
+      {/* Response Options - Clean Gemini Pill Buttons */}
       {isLatest && !isConclusion && data.response_options && data.response_options.length > 0 && (
-        <div className="space-y-4 pt-4">
-            <p className="text-[10px] font-bold text-slate-300 uppercase tracking-[0.2em]">Test Results</p>
-            <div className="flex flex-wrap gap-2">
-            {data.response_options.map((option: string) => (
-                <Button
-                key={option}
-                onClick={() => onOptionSelect(option)}
-                variant="outline"
-                className={cn(
-                    "h-auto py-3 px-8 rounded-full border-slate-200 font-semibold text-[14px] transition-all",
-                    "hover:bg-slate-900 hover:border-slate-900 hover:text-white text-slate-600"
-                )}
-                >
-                {option}
-                </Button>
-            ))}
-            </div>
+        <div className="flex flex-wrap gap-3 pt-6 border-t border-slate-50">
+          {data.response_options.map((option: string) => (
+            <Button
+              key={option}
+              onClick={() => onOptionSelect(option)}
+              variant="outline"
+              className={cn(
+                "h-auto py-2.5 px-6 rounded-full border-slate-200 font-medium text-[14px] transition-all duration-300",
+                "hover:bg-slate-900 hover:border-slate-900 hover:text-white text-slate-600 bg-white shadow-sm"
+              )}
+            >
+              {option}
+            </Button>
+          ))}
         </div>
       )}
     </div>
