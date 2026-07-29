@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { logout } from "../features/authSlice";
 import { RootState } from "../store";
 
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:13079/api/v1";
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:33079/api/v1";
 
 const baseQueryWithAuth: ReturnType<typeof fetchBaseQuery> = async (
   args,

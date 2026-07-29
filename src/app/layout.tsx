@@ -3,6 +3,7 @@ import ReduxProvider from "@/redux/ReduxProvider";
 import type { Metadata } from "next";
 import { Roboto, Montserrat } from "next/font/google";
 import { Toaster } from "sonner";
+import { ViewTransitions } from "next-view-transitions";
 import "./globals.css";
 
 const roboto = Roboto({
@@ -18,8 +19,8 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "Starter kit",
-  description: "starter kit for nextjs with redux and redux persist",
+  title: "Automobile Frontend",
+  description: "Automobile service platform frontend",
 };
 
 export default function RootLayout({
@@ -28,14 +29,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      {/* <body className={`${roboto.variable} ${montserrat.variable} antialiased font-montserrat`}> */}
-      <body className={`${roboto.variable} antialiased`}>
-        <Toaster position="top-center" richColors />
-        <NextAuthSessionProvider>
-          <ReduxProvider>{children}</ReduxProvider>
-        </NextAuthSessionProvider>
-      </body>
-    </html>
+    <ViewTransitions>
+      <html lang="en" suppressHydrationWarning>
+        <body className={`${roboto.variable} ${montserrat.variable} antialiased`}>
+          <Toaster position="top-center" richColors />
+          <NextAuthSessionProvider>
+            <ReduxProvider>{children}</ReduxProvider>
+          </NextAuthSessionProvider>
+        </body>
+      </html>
+    </ViewTransitions>
   );
 }
