@@ -1,11 +1,5 @@
-import RegisterPage from "@/components/module/Auth/SignUp";
+import Register from "@/components/auth/Register";
 
-const page = () => {
-  return (
-    <div>
-      <RegisterPage />
-    </div>
-  );
-};
-
-export default page;
+export default function RegisterPage() {
+  return <Register />;
+}
