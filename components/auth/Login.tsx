@@ -74,7 +74,7 @@ export default function Login() {
           <div className="mb-6 w-48 h-auto">
             <Image 
               src="/Logo.png" 
-              alt="SmartAutoTech Logo" 
+              alt="NextGen AutoTech Logo" 
               width={200} 
               height={60} 
               className="object-contain mx-auto"

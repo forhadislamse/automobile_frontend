@@ -22,7 +22,7 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAppSelector } from "@/redux/hooks";
 import { useGetMeQuery } from "@/redux/api/authApi";
-import Logo from "@/src/assets/logo2.png";
+import { LogoIcon } from "@/components/shared/LogoIcon";
 
 interface PlanFeature {
   name: string;
@@ -178,7 +178,7 @@ export default function LandingPage() {
                             Most Shops Don't Have a Diagnostic Problem
                         </h2>
                         <p className="text-lg text-gray-500 font-medium mt-6 max-w-2xl">
-                            They have a workflow, data, and talent problem. SmartAutoTech brings everything into one unified platform so you can fix cars faster.
+                            They have a workflow, data, and talent problem. NextGen AutoTech brings everything into one unified platform so you can fix cars faster.
                         </p>
                     </div>
 
@@ -228,7 +228,7 @@ export default function LandingPage() {
                                 A Foreman That Never Leaves the Bay
                             </h2>
                             <p className="text-lg text-gray-600 font-medium mb-10 leading-relaxed">
-                                SmartAutoTech acts as a highly experienced foreman standing right next to your junior techs, guiding them through complex electrical and drivability issues step-by-step.
+                                NextGen AutoTech acts as a highly experienced foreman standing right next to your junior techs, guiding them through complex electrical and drivability issues step-by-step.
                             </p>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 {["More Profit", "Better Techs", "Faster Fixes", "Less Comebacks"].map((text, i) => (
@@ -451,15 +451,15 @@ export default function LandingPage() {
             <footer className="py-12 bg-white border-t border-gray-200">
                 <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
                     <div className="flex items-center gap-3">
-                        <div className="relative w-10 h-10">
-                            <Image src={Logo.src} alt="Logo" fill className="object-contain" />
+                        <div className="flex items-center">
+                            <LogoIcon className="w-10 h-10" />
                         </div>
                         <span className="text-2xl font-black text-gray-900 tracking-tight italic">
-                            SmartAuto<span className="text-[#FF6B00]">Tech</span>
+                            NextGen <span className="text-[#FF6B00]">AutoTech</span>
                         </span>
                     </div>
                     <p className="text-gray-500 font-medium text-sm">
-                        © 2026 SmartAutoTech AI. All rights reserved.
+                        © 2026 NextGen AutoTech AI. All rights reserved.
                     </p>
                     <div className="flex gap-8">
                         <Link href="/terms" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">Terms of Service</Link>

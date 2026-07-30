@@ -1,50 +1,47 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { ArrowUpRight, Menu } from "lucide-react";
-import Logo from "@/src/assets/logo2.png";
+import { LogoIcon } from "@/components/shared/LogoIcon";
 import { Button } from "@/components/ui/button";
 import { useGetMeQuery } from "@/redux/api/authApi";
 import { useAppSelector } from "@/redux/hooks";
+import { useDispatch } from "react-redux";
+import { logout } from "@/redux/features/authSlice";
 
 const Navbar = () => {
+    const dispatch = useDispatch();
     const token = useAppSelector((state) => state.auth.token);
     const { data: userData, isLoading } = useGetMeQuery(undefined, { skip: !token });
-    const user = (userData as any)?.data;
+    const user = token ? (userData as any)?.data : null;
 
     const navLinks = [
         { name: "Home", href: "/" },
         { name: "Features", href: "#features" },
         { name: "Pricing", href: "#pricing" },
-        { name: "Process", href: "#how-it-works" },
+        { name: "How it works", href: "#how-it-works" },
     ];
 
     return (
-        <header className="w-full bg-[#0a1628]/95 text-white fixed top-0 z-[100] border-b border-white/10 backdrop-blur-xl transition-all duration-300">
-            <div className="container mx-auto px-4 md:px-6 h-16 md:h-20 flex justify-between items-center">
+        <header className="w-full bg-white/90 text-gray-900 fixed top-0 z-[100] border-b border-gray-200 backdrop-blur-xl transition-all duration-300">
+            <div className="container mx-auto px-4 md:px-6 h-20 md:h-24 flex justify-between items-center">
                 {/* Logo Section */}
                 <Link href="/" className="flex items-center gap-2 group shrink-0">
-                    <div className="relative w-8 h-8 md:w-10 md:h-10 transition-transform group-hover:scale-110">
-                        <Image
-                            src={Logo.src}
-                            alt="Logo"
-                            fill
-                            className="object-contain"
-                        />
+                    <div className="transition-transform group-hover:scale-105">
+                        <LogoIcon className="w-10 h-10 md:w-12 md:h-12" />
                     </div>
-                    <span className="text-lg md:text-xl font-black tracking-tight text-white uppercase italic hidden sm:block">
-                        SmartAuto<span className="text-blue-500">Tech</span>
+                    <span className="text-xl md:text-2xl font-bold tracking-tight text-gray-900 hidden sm:block">
+                        NextGen <span className="text-[#FF6B00]">AutoTech</span>
                     </span>
                 </Link>
 
                 {/* Desktop Navigation Links */}
-                <nav className="hidden lg:flex items-center gap-8">
+                <nav className="hidden lg:flex items-center gap-10 absolute left-1/2 transform -translate-x-1/2">
                     {navLinks.map((link) => (
                         <Link 
                             key={link.name}
                             href={link.href}
-                            className="text-[13px] font-bold text-gray-400 hover:text-white transition-all uppercase tracking-widest"
+                            className="text-[15px] font-medium text-gray-600 hover:text-[#FF6B00] transition-colors"
                         >
                             {link.name}
                         </Link>
@@ -52,41 +49,47 @@ const Navbar = () => {
                 </nav>
 
                 {/* Actions: Login & Get Started */}
-                <div className="flex items-center gap-4 md:gap-8">
-                    {!isLoading && !user && (
-                        <Link 
-                            href="/login" 
-                            className="text-[11px] md:text-[12px] font-black text-white/70 hover:text-white transition-all uppercase tracking-[0.2em] border-r border-white/10 pr-6 mr-1 hidden sm:block"
-                        >
-                             Existing User? <span className="text-blue-400 ml-1">Login</span>
-                        </Link>
-                    )}
-                    
-                    {!isLoading && !user && (
-                        <Link href="/login" className="sm:hidden text-[11px] font-black text-blue-400 uppercase tracking-widest">
-                            Login
-                        </Link>
-                    )}
-                    
+                <div className="flex items-center gap-6 md:gap-8">
                     {isLoading ? (
-                        <div className="w-24 md:w-32 h-10 md:h-12 bg-white/5 animate-pulse rounded-full" />
+                        <div className="w-32 h-12 bg-gray-100 animate-pulse rounded-xl" />
                     ) : user ? (
-                        <Link href={user.role === "ADMIN" ? "/admin/dashboard" : user.role === "TECHNICIAN" ? "/user/diagnostics" : "/user"}>
-                             <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-6 md:px-10 py-4 md:py-6 font-black flex items-center gap-2 text-[12px] md:text-[13px] uppercase tracking-widest shadow-xl shadow-blue-600/20 active:scale-95 transition-all">
-                                Go to Dashboard <ArrowUpRight className="w-4 h-4" />
-                             </Button>
-                        </Link>
+                        <>
+                            <button 
+                                onClick={() => dispatch(logout())}
+                                className="text-[15px] font-bold text-gray-700 hover:text-rose-500 transition-colors hidden sm:block"
+                            >
+                                Logout
+                            </button>
+                            <Link href={user.role === "ADMIN" ? "/admin/dashboard" : user.role === "TECHNICIAN" ? "/user/diagnostics" : "/user"}>
+                                 <Button className="bg-[#FF6B00] hover:bg-[#E66000] text-white rounded-xl px-8 py-6 font-bold flex items-center gap-2 text-[15px] shadow-lg shadow-orange-500/25 active:scale-95 transition-all">
+                                    Dashboard <ArrowUpRight className="w-5 h-5" />
+                                 </Button>
+                            </Link>
+                        </>
                     ) : (
-                        <Link href="/shop-onboarding">
-                            <Button className="bg-white hover:bg-white/90 text-[#0a1628] rounded-full px-6 md:px-10 py-4 md:py-6 font-black flex items-center gap-2 text-[12px] md:text-[13px] uppercase tracking-widest shadow-2xl transition-all active:scale-95">
-                                Join Now <ArrowUpRight className="w-4 h-4" />
-                            </Button>
-                        </Link>
+                        <>
+                            <Link 
+                                href="/login" 
+                                className="text-[15px] font-bold text-gray-700 hover:text-[#FF6B00] transition-colors hidden sm:block"
+                            >
+                                 Login
+                            </Link>
+                            
+                            <Link href="/login" className="sm:hidden text-[14px] font-bold text-[#FF6B00]">
+                                Login
+                            </Link>
+                            
+                            <Link href="/register">
+                                <Button className="bg-[#1F2937] hover:bg-black text-white rounded-xl px-8 py-6 font-bold flex items-center gap-2 text-[15px] shadow-xl transition-all active:scale-95">
+                                    Get started <ArrowUpRight className="w-5 h-5" />
+                                </Button>
+                            </Link>
+                        </>
                     )}
 
                     {/* Mobile Menu Icon */}
-                    <button className="lg:hidden p-2 text-white/70 hover:text-white transition-colors">
-                        <Menu size={24} />
+                    <button className="lg:hidden p-2 text-gray-600 hover:text-[#FF6B00] transition-colors">
+                        <Menu size={28} />
                     </button>
                 </div>
             </div>

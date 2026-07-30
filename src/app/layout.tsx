@@ -19,8 +19,11 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "Automobile Frontend",
-  description: "Automobile service platform frontend",
+  title: "NextGen AutoTech | Shop Management Software",
+  description: "NextGen AutoTech is the ultimate shop management software for automotive repair shops.",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({
