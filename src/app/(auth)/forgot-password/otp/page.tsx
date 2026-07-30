@@ -1,35 +1,38 @@
 import Otp from "@/components/module/Auth/otp";
+import Image from "next/image";
 
-export default function OtpVerificationPage() {
+export default function ResetPassword() {
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="flex w-full max-w-6xl items-center gap-10 lg:gap-24">
-        {/* Left Side: Branding */}
-        <div className="hidden lg:flex flex-1 items-center justify-center bg-[#0a1628] rounded-[2.5rem] min-h-[85vh] relative overflow-hidden group">
-          <div className="absolute inset-0 bg-blue-600/5 backdrop-blur-3xl animate-pulse" />
-          <div className="relative z-10 text-center animate-in fade-in zoom-in duration-700">
-             <Image
-                src="/logo2.png"
-                alt="Logo"
-                width={280}
-                height={280}
-                className="object-contain transition-transform duration-500 group-hover:scale-105"
-                priority
-              />
-              <div className="mt-8">
-                 <h2 className="text-white text-3xl font-black tracking-tighter uppercase italic">
-                   SmartAuto<span className="text-blue-500">Tech</span>
-                 </h2>
-                 <p className="text-gray-400 font-medium tracking-[0.3em] text-[10px] mt-2">AI DRIVEN DIAGNOSTICS</p>
-              </div>
+    <div className="min-h-screen flex flex-col lg:flex-row">
+      <div className="w-1/2 border-r border-slate-200 relative flex flex-col justify-between bg-[url('/Lo.png')] bg-cover bg-center">
+        <div className="relative z-10">
+          <div className="mb-8 flex justify-center">
+            <Image
+              src="/r_logo.png"
+              alt="SmartAuto Logo"
+              width={200}
+              height={200}
+              className="h-52 w-52"
+            />
           </div>
         </div>
 
-        {/* Right Side: OTP Component */}
-        <div className="w-full max-w-md animate-in fade-in slide-in-from-right-8 duration-500">
-          <Otp />
+        <div className="relative z-10 flex justify-between">
+          <Image
+            src="/images/Typing.png"
+            alt="SmartAuto Logo"
+            width={12000}
+            height={12000}
+            className="object-cover  rounded-lg"
+            priority
+          />
         </div>
+      </div>
+
+      <div className="w-full lg:w-1/2 flex items-center justify-center bg-white">
+        <Otp />
       </div>
     </div>
   );
 }
+

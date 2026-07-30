@@ -17,6 +17,7 @@ type PHInputProps = {
   name: string;
   label?: string;
   disabled?: boolean;
+  icon?: React.ComponentType<any>; // dynamic icon component
   placeholder?: string;
   control: any;
 };
@@ -26,11 +27,15 @@ const PHInput = ({
   name,
   label,
   disabled,
+  icon: Icon,
   placeholder,
   control,
 }: PHInputProps) => {
   const isPassword = type === "password";
   const [showPassword, setShowPassword] = useState(false);
+
+  // Adjust padding if there's an icon or password toggle
+  const inputPaddingClass = isPassword || Icon ? "px-10 py-6" : "py-6";
 
   return (
     <FormField
@@ -38,7 +43,11 @@ const PHInput = ({
       name={name}
       render={({ field }) => (
         <FormItem className="space-y-2">
-          {label && <FormLabel htmlFor={name}>{label}</FormLabel>}
+          {label && (
+            <FormLabel className="font-semibold text-[#4d5057]" htmlFor={name}>
+              {label}
+            </FormLabel>
+          )}
 
           <FormControl>
             <div className="relative">
@@ -48,9 +57,17 @@ const PHInput = ({
                 disabled={disabled}
                 placeholder={placeholder}
                 type={isPassword ? (showPassword ? "text" : "password") : type}
-                className={isPassword ? "pr-10  py-6" : " py-6"}
+                className={inputPaddingClass}
               />
 
+              {/* Left Icon */}
+              {Icon && (
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                  <Icon className="h-4 w-4" />
+                </div>
+              )}
+
+              {/* Password Toggle */}
               {isPassword && (
                 <button
                   type="button"
@@ -75,3 +92,4 @@ const PHInput = ({
 };
 
 export default PHInput;
+

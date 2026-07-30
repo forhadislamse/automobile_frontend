@@ -251,3 +251,4 @@ export default function Step3_Payment({ onPrev, data }: any) {
         </Elements>
     );
 }
+

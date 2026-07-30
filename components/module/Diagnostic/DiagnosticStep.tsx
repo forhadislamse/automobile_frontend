@@ -151,3 +151,4 @@ const DiagnosticStep: React.FC<DiagnosticStepProps> = ({ content, onOptionSelect
 };
 
 export default DiagnosticStep;
+

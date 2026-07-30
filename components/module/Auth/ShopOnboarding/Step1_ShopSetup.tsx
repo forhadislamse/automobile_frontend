@@ -199,3 +199,4 @@ export default function Step1_ShopSetup({ onNext, data }: any) {
     </div>
   );
 }
+

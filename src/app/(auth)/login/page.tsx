@@ -1,5 +1,12 @@
-import Login from "@/components/auth/Login";
+import LoginPage from "@/components/module/Auth/Login";
 
-export default function LoginPage() {
-  return <Login />;
-}
+const page = () => {
+  return (
+    <div>
+      <LoginPage />
+    </div>
+  );
+};
+
+export default page;
+

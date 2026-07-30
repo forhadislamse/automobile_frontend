@@ -6,14 +6,12 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import Logo from "@/src/assets/logo2.png";
+import Logo from "@/src/assets/logo.png";
 import {
   HandCoins,
   Home,
   InfoIcon,
   LayoutDashboard,
-  Search,
-  BookOpen,
   User,
   Users,
 } from "lucide-react";
@@ -27,30 +25,11 @@ const data = {
     navMain: [
       {
         title: "Dashboard",
-        url: "/user",
+        url: "/shop-owner/dashboard",
         icon: LayoutDashboard,
       },
       {
-        title: "Account Management",
-        url: "/user/dashboard/profile",
-        icon: User,
-      },
-      {
-        title: "Go Back To Home",
-        url: "/",
-        icon: Home,
-      },
-    ],
-  },
-  technician: {
-    navMain: [
-      {
-        title: "AI Diagnostics",
-        url: "/user/diagnostics",
-        icon: Search,
-      },
-      {
-        title: "Account Management",
+        title: "Your Profile",
         url: "/user/dashboard/profile",
         icon: User,
       },
@@ -70,35 +49,25 @@ const data = {
       },
       {
         title: "Users",
-        url: "/admin/users",
-        icon: Users,
-      },
-      {
-        title: "Transactions",
-        url: "/admin/transactions",
+        url: "/user/dashboard/users",
         icon: HandCoins,
-      },
-      {
-        title: "Subscriptions",
-        url: "/admin/subscriptions",
-        icon: BookOpen,
-      },
-      {
-        title: "Content",
-        url: "#",
-        icon: InfoIcon,
         items: [
           {
-            title: "Chapters",
-            url: "/admin/chapters",
-            icon: BookOpen,
+            title: "Users",
+            url: "/user/dashboard/estimates",
+            icon: Users,
           },
           {
-            title: "Sections",
-            url: "/admin/sections",
-            icon: Search,
+            title: "Pending Users",
+            url: "/user/dashboard/pending-users",
+            icon: InfoIcon,
           },
         ],
+      },
+      {
+        title: "Your Profile",
+        url: "/user/dashboard/profile",
+        icon: User,
       },
       {
         title: "Go Back To Home",
@@ -123,18 +92,17 @@ export default function AppSidebar({ role, ...props }: AppSidebarProps) {
       className="w-64 bg-white border-r border-blue-200"
       {...props}
     >
-      <SidebarHeader className="py-4">
+      <SidebarHeader>
         <Link
           href={"/"}
-          className="flex items-center w-full justify-center"
+          className="flex items-center w-full max-h-40 justify-center"
         >
           <Image
             src={Logo.src}
             alt="Logo"
-            width={160}
-            height={60}
-            className="w-auto h-auto max-w-[80%] max-h-16 object-contain"
-            priority
+            width={300}
+            height={300}
+            className="size-auto "
           />
         </Link>
       </SidebarHeader>
@@ -148,3 +116,4 @@ export default function AppSidebar({ role, ...props }: AppSidebarProps) {
     </Sidebar>
   );
 }
+

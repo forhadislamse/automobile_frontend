@@ -23,7 +23,7 @@ interface NRTableProps<TData, TValue> {
   emptyMessage?: string;
 }
 
-export function NRTable<TData, TValue>({
+export function RWTable<TData, TValue>({
   columns,
   data,
   emptyMessage = "No results.",
@@ -37,19 +37,19 @@ export function NRTable<TData, TValue>({
   return (
     <div className="my-5">
       <Table>
-        <TableHeader className="bg-gray-100 my-16">
+        <TableHeader className="bg-gray-100 my-16 scroll-auto">
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
                 <TableHead
                   key={header.id}
-                  className="py-6 text-md font-semibold text-gray-600 first:rounded-l-xl last:rounded-r-xl"
+                  className="py-6  text-md font-semibold text-gray-600 first:rounded-l-xl last:rounded-r-xl"
                 >
                   {header.isPlaceholder
                     ? null
                     : flexRender(
                         header.column.columnDef.header,
-                        header.getContext()
+                        header.getContext(),
                       )}
                 </TableHead>
               ))}
@@ -83,3 +83,4 @@ export function NRTable<TData, TValue>({
     </div>
   );
 }
+

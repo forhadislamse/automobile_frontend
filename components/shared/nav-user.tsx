@@ -18,7 +18,7 @@ import {
 import placeholder from "@/src/assets/placeholders/image_placeholder.png";
 import { ChevronsUpDown, LogOut } from "lucide-react";
 
-import { useGetMeQuery, useLogoutMutation } from "@/redux/api/authApi";
+import { useGetMeQuery } from "@/redux/api/authApi";
 import { logout } from "@/redux/features/authSlice";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import Image from "next/image";
@@ -30,17 +30,11 @@ export function NavUser() {
   const dispatch = useAppDispatch();
 
   const { data, error, isLoading } = useGetMeQuery({ skip: !token }) as any;
-  const [logoutMutation] = useLogoutMutation();
 
   const router = useRouter();
   const pathname = usePathname();
 
   const handleLogout = async () => {
-    try {
-      await logoutMutation({}).unwrap();
-    } catch (err) {
-      console.error("Logout failed", err);
-    }
     dispatch(logout());
     router.push("/login?redirect=" + pathname);
   };
@@ -92,14 +86,14 @@ export function NavUser() {
             >
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage
-                  src={data?.data?.profileImage || placeholder.src}
-                  alt={data?.data?.fullName ?? "User"}
+                  src={data?.image || placeholder}
+                  alt={data?.firstName ?? "User"}
                   className="h-8 w-8 object-cover rounded-lg"
                 />
                 <AvatarFallback className="rounded-lg">
                   <Image
-                    src={data?.data?.profileImage || placeholder}
-                    alt={data?.data?.fullName ?? "User"}
+                    src={data?.image || placeholder}
+                    alt={data?.firstName ?? "User"}
                     width={60}
                     height={60}
                     className="h-8 w-8 object-cover rounded-lg"
@@ -108,10 +102,10 @@ export function NavUser() {
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">
-                  {data?.data?.fullName || "User"}
+                  {data?.firstName || "User"}
                 </span>
-                <span className="truncate text-xs font-medium text-blue-500">
-                  {data?.data?.plan?.name || (data?.data?.role === 'TECHNICIAN' ? "Technician" : "Free Plan")}
+                <span className="truncate text-xs">
+                  {data?.email || "No email"}
                 </span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
@@ -127,14 +121,14 @@ export function NavUser() {
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage
-                    src={data?.data?.profileImage || placeholder.src}
-                    alt={data?.data?.fullName ?? "User"}
+                    src={data?.image || placeholder.src}
+                    alt={data?.firstName ?? "User"}
                     className="h-8 w-8 object-cover rounded-lg"
                   />
                   <AvatarFallback className="rounded-lg">
                     <Image
-                      src={data?.data?.profileImage || placeholder}
-                      alt={data?.data?.fullName ?? "User"}
+                      src={data?.image || placeholder}
+                      alt={data?.firstName ?? "User"}
                       width={60}
                       height={60}
                       className="h-8 w-8 object-cover rounded-lg"
@@ -143,10 +137,10 @@ export function NavUser() {
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">
-                    {data?.data?.fullName || "User"}
+                    {data?.firstName || "User"}
                   </span>
-                  <span className="truncate text-xs font-medium text-blue-500">
-                    {data?.data?.plan?.name || (data?.data?.role === 'TECHNICIAN' ? "Technician" : "Free Plan")}
+                  <span className="truncate text-xs">
+                    {data?.email || "No email"}
                   </span>
                 </div>
               </div>
@@ -162,3 +156,4 @@ export function NavUser() {
     </SidebarMenu>
   );
 }
+

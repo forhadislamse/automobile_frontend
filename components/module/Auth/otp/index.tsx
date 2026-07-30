@@ -16,42 +16,34 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
+// OTP SCHEMA FOR 6 DIGITS
 const otpSchema = z.object({
   otp: z
     .array(
       z
         .string()
         .length(1)
-        .regex(/^[A-Za-z0-9]$/, "Must be alphanumeric")
+        .regex(/^[A-Za-z0-9]$/, "Must be alphanumeric"),
     )
     .length(6),
 });
 
 type OtpFormData = z.infer<typeof otpSchema>;
 
-interface OtpProps {
-  successRedirect?: (email: string) => string;
-  successMessage?: string;
-  verifyMutation?: any;
-}
-
-export default function Otp({
-  successRedirect = (email) => `/forgot-password/change-password?email=${email}`,
-  successMessage,
-  verifyMutation
-}: OtpProps) {
+export default function Otp() {
   const searchParams = useSearchParams();
   const email = searchParams.get("email");
 
   const [reSendOtp] = useResendOtpMutation() as any;
-  const [defaultVerifyOtp, { isLoading: isVerifyingOtpDefault }] = useVerifyOtpMutation() as any;
-  const [providedVerifyOtp, { isLoading: isVerifyingOtpProvided }] = verifyMutation ? verifyMutation() : [null, { isLoading: false }];
-
-  const verifiedOtp = verifyMutation ? providedVerifyOtp : defaultVerifyOtp;
-  const isVerifyingOtp = verifyMutation ? isVerifyingOtpProvided : isVerifyingOtpDefault;
+  const [verifiedOtp, { isLoading: isVerifyingOtp }] =
+    useVerifyOtpMutation() as any;
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const [otpValues, setOtpValues] = useState<string[]>(Array(6).fill(""));
+
+  // TIMER
+  const [timeLeft, setTimeLeft] = useState(300);
+  const [isCounting, setIsCounting] = useState(true);
 
   const {
     handleSubmit,
@@ -65,6 +57,38 @@ export default function Otp({
     },
   });
 
+  const router = useRouter();
+
+  const formatTime = (seconds: number) => {
+    const min = Math.floor(seconds / 60);
+    const sec = seconds % 60;
+    return `${min}:${sec.toString().padStart(2, "0")}`;
+  };
+
+  // TIMER EFFECT
+  useEffect(() => {
+    if (!isCounting) return;
+
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          setIsCounting(false);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [isCounting]);
+
+  // AUTO FOCUS
+  useEffect(() => {
+    inputRefs.current[0]?.focus();
+  }, []);
+
+  // RESEND OTP
   const handleResendOtp = async () => {
     if (!email) {
       toast.error("Email not found");
@@ -72,9 +96,13 @@ export default function Otp({
     }
 
     try {
-      const res = await reSendOtp({ email: email }).unwrap();
+      const res = await reSendOtp({ email }).unwrap();
+
       if (res.success) {
         toast.success(res.message);
+
+        setTimeLeft(300);
+        setIsCounting(true);
       } else {
         toast.error(res.message || "Failed to resend OTP");
       }
@@ -83,6 +111,7 @@ export default function Otp({
     }
   };
 
+  // INPUT CHANGE
   const handleChange = (index: number, value: string) => {
     if (value.length > 1) {
       const digits = value.split("").slice(0, 6 - index);
@@ -112,9 +141,10 @@ export default function Otp({
     trigger("otp");
   };
 
+  // KEYBOARD NAVIGATION
   const handleKeyDown = (
     index: number,
-    e: React.KeyboardEvent<HTMLInputElement>
+    e: React.KeyboardEvent<HTMLInputElement>,
   ) => {
     if (e.key === "Backspace" && !otpValues[index] && index > 0) {
       inputRefs.current[index - 1]?.focus();
@@ -125,21 +155,22 @@ export default function Otp({
     }
   };
 
-  const router = useRouter();
-
+  // SUBMIT
   const onSubmit = async (data: OtpFormData) => {
     if (!email) {
       toast.error("Email not found");
       return;
     }
 
-    const payload = { email: email, otp: Number(data.otp.join("")) };
+    const payload = { email, otp: Number(data.otp.join("")) };
 
     try {
       const res = await verifiedOtp(payload).unwrap();
+      console.log("res", res);
+
       if (res.success) {
-        toast.success(successMessage || res.message);
-        router.push(successRedirect(email));
+        toast.success(res.message);
+        router.push(`/forgot-password/otp/change-password?email=${email}`);
       } else {
         toast.error(res.message || "Failed to verify OTP");
       }
@@ -148,84 +179,84 @@ export default function Otp({
     }
   };
 
-  useEffect(() => {
-    inputRefs.current[0]?.focus();
-  }, []);
-
   return (
-    <div className="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-2xl border border-gray-100">
-      <div className="mb-10">
-        <h1 className="text-3xl font-black text-[#0a1628] tracking-tight mb-3 text-center">Enter Code</h1>
-        <p className="text-gray-400 font-medium text-sm leading-relaxed text-center">
-          We have sent a verification code to email address: <br />
-          <span className="text-[#0a1628] font-bold">{email}</span>
-        </p>
-      </div>
-
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-        <div className="flex justify-between gap-2">
-          {[0, 1, 2, 3, 4, 5].map((index) => (
-            <div key={index} className="flex-1">
-              <input
-                ref={(el) => {
-                  inputRefs.current[index] = el;
-                }}
-                type="text"
-                inputMode="numeric"
-                maxLength={1}
-                value={otpValues[index]}
-                onChange={(e) => handleChange(index, e.target.value)}
-                onKeyDown={(e) => handleKeyDown(index, e)}
-                className="w-full aspect-square text-center text-2xl font-black rounded-2xl bg-gray-50 border-gray-100 focus:bg-white focus:ring-4 focus:ring-blue-50 focus:border-blue-200 outline-none transition-all text-[#0a1628]"
-              />
+    <div className="min-h-screen flex items-center justify-center">
+      <AnimatePresence>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.9, y: 20 }}
+          className="w-full max-w-md"
+        >
+          <div className="bg-white p-8">
+            <div className="text-center mb-8">
+              <h1 className="text-[30px] font-bold mb-2">
+                Enter verification code
+              </h1>
+              <p className="text-gray-600">We’ve sent a code to {email}</p>
             </div>
-          ))}
-        </div>
-        
-        {errors.otp && (
-          <p className="text-red-500 text-xs font-bold text-center -mt-4 animate-in fade-in slide-in-from-top-1">
-            Please enter a valid 6-digit verification code.
-          </p>
-        )}
 
-        <div className="text-center">
-          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">
-            Didn't get a code?{" "}
-            <button
-              type="button"
-              onClick={handleResendOtp}
-              className="text-blue-500 hover:text-blue-600 transition-colors ml-1 underline decoration-2 underline-offset-4"
-            >
-              Click to resend
-            </button>
-          </p>
-        </div>
-
-        <div className="space-y-4">
-          <Button
-            type="submit"
-            disabled={isVerifyingOtp || otpValues.some((v) => !v)}
-            className="w-full py-8 rounded-2xl bg-[#0a1628] hover:bg-gray-800 text-white font-black text-lg uppercase tracking-widest shadow-2xl shadow-blue-900/20 transition-all active:scale-[0.98]"
-          >
-            {isVerifyingOtp ? (
-              <div className="flex items-center gap-2">
-                <Loader2 className="animate-spin h-5 w-5" /> Verifying...
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              {/* OTP INPUTS */}
+              <div className="flex gap-3 justify-between">
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <input
+                    key={index}
+                    ref={(el) => (inputRefs.current[index] = el) as any}
+                    type="text"
+                    inputMode="numeric"
+                    value={otpValues[index]}
+                    onChange={(e) => handleChange(index, e.target.value)}
+                    onKeyDown={(e) => handleKeyDown(index, e)}
+                    className="w-full aspect-square text-center text-xl border rounded-lg"
+                  />
+                ))}
               </div>
-            ) : (
-              "Verify"
-            )}
-          </Button>
 
-          <div className="text-center pt-4">
-            <Link
-              href="/forgot-password"
-              className="text-[11px] font-black text-gray-400 hover:text-[#0a1628] uppercase tracking-[0.2em] transition-colors"
-            >
-              Back to Signin
-            </Link>
+              {errors.otp && (
+                <p className="text-red-500 text-sm text-center mt-2">
+                  Please enter a valid 6-digit code
+                </p>
+              )}
+
+              {/* RESEND */}
+              <div className="text-center">
+                Didn’t get a code?{" "}
+                {isCounting ? (
+                  <span className="text-gray-500">
+                    Resend in {formatTime(timeLeft)}
+                  </span>
+                ) : (
+                  <span
+                    onClick={handleResendOtp}
+                    className="font-semibold cursor-pointer hover:underline"
+                  >
+                    Click to resend
+                  </span>
+                )}
+              </div>
+
+              {/* BUTTONS */}
+              <div className="flex gap-4">
+                <button
+                  type="submit"
+                  disabled={isVerifyingOtp || otpValues.some((v) => !v)}
+                  className="w-full bg-primary cursor-pointer text-white py-3 rounded-lg"
+                >
+                  {isVerifyingOtp ? "Loading..." : "Verify OTP"}
+                </button>
+
+                <Link href="/forgot-password" className="w-full">
+                  <Button variant="outline" className="w-full py-6">
+                    Cancel
+                  </Button>
+                </Link>
+              </div>
+            </form>
           </div>
-        </div>
-      </form>
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 }
+

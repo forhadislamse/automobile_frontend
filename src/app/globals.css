@@ -6,9 +6,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-montserrat);
-  --font-roboto: var(--font-roboto);
-  --font-montserrat: var(--font-montserrat);
+  --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -53,7 +51,7 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: #3b0014;
+  --primary: #042055;
   --primary-foreground: #ffffff;
 
   --secondary: oklch(0.97 0 0);
@@ -120,55 +118,6 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground font-montserrat;
-  }
-}
-
-@layer utilities {
-  .wiki-doc-container {
-    @apply max-w-[1200px] mx-auto px-6 md:px-12 py-12 flex gap-12;
-  }
-  
-  .wiki-main-content {
-    @apply flex-1 min-w-0;
-  }
-  
-  .wiki-sidebar {
-    @apply hidden xl:block w-72 shrink-0;
-  }
-  
-  .wiki-sticky-sidebar {
-    @apply sticky top-24 max-h-[calc(100vh-6rem)] overflow-y-auto pr-4;
-  }
-
-  .wiki-legal-text {
-    @apply font-serif text-[1.15rem] leading-[1.8] text-gray-800 antialiased;
-  }
-
-  .wiki-section-heading {
-    @apply text-2xl font-bold border-b border-gray-200 pb-2 mb-6 mt-12 first:mt-0 text-[#0F172A];
-  }
-
-  .wiki-subchapter-heading {
-    @apply text-lg font-black text-gray-400 uppercase tracking-[0.2em] mb-8 pt-8 border-t border-gray-50;
-  }
-
-  .wiki-infobox {
-    @apply bg-gray-50 border border-gray-200 p-6 rounded-xl space-y-4 text-sm;
-  }
-
-  .wiki-indent-1 { @apply pl-8; }
-  .wiki-indent-2 { @apply pl-16; }
-  .wiki-indent-3 { @apply pl-24; }
-
-  /* Custom scrollbar for sidebar */
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 4px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-track {
-    @apply bg-transparent;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    @apply bg-gray-200 rounded-full hover:bg-gray-300 transition-colors;
+    @apply bg-background text-foreground;
   }
 }

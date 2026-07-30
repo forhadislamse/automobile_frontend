@@ -11,13 +11,14 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "**",
       },
+
       {
         protocol: "https",
         hostname: "localhost",
       },
     ],
+    domains: ["localhost", "127.0.0.1", "i.ibb.co"],
   },
-  allowedDevOrigins: ["10.0.30.150", "localhost:3000"],
 };
 
 export default nextConfig;

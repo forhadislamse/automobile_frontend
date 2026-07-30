@@ -24,7 +24,7 @@ const otpSchema = z.object({
         .length(1)
         .regex(/^[A-Za-z0-9]$/, "Must be alphanumeric")
     )
-    .length(6),
+    .length(4),
 });
 
 type OtpFormData = z.infer<typeof otpSchema>;
@@ -38,7 +38,7 @@ export default function OtpVerify() {
     useVerifyOtpMutation() as any;
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-  const [otpValues, setOtpValues] = useState<string[]>(Array(6).fill(""));
+  const [otpValues, setOtpValues] = useState<string[]>(Array(4).fill(""));
 
   const {
     handleSubmit,
@@ -48,7 +48,7 @@ export default function OtpVerify() {
   } = useForm<OtpFormData>({
     resolver: zodResolver(otpSchema),
     defaultValues: {
-      otp: Array(6).fill(""),
+      otp: Array(4).fill(""),
     },
   });
 
@@ -74,18 +74,18 @@ export default function OtpVerify() {
 
   const handleChange = (index: number, value: string) => {
     if (value.length > 1) {
-      const digits = value.split("").slice(0, 6 - index);
+      const digits = value.split("").slice(0, 4 - index);
       const newOtpValues = [...otpValues];
 
       digits.forEach((digit, i) => {
-        if (index + i < 6) {
+        if (index + i < 4) {
           newOtpValues[index + i] = digit;
           setValue(`otp.${index + i}`, digit);
         }
       });
 
       setOtpValues(newOtpValues);
-      const nextIndex = Math.min(index + digits.length, 5);
+      const nextIndex = Math.min(index + digits.length, 3);
       inputRefs.current[nextIndex]?.focus();
     } else if (/^[0-9]$/.test(value) || value === "") {
       const newOtpValues = [...otpValues];
@@ -93,7 +93,7 @@ export default function OtpVerify() {
       setOtpValues(newOtpValues);
       setValue(`otp.${index}`, value);
 
-      if (value && index < 5) {
+      if (value && index < 3) {
         inputRefs.current[index + 1]?.focus();
       }
     }
@@ -109,7 +109,7 @@ export default function OtpVerify() {
       inputRefs.current[index - 1]?.focus();
     } else if (e.key === "ArrowLeft" && index > 0) {
       inputRefs.current[index - 1]?.focus();
-    } else if (e.key === "ArrowRight" && index < 5) {
+    } else if (e.key === "ArrowRight" && index < 3) {
       inputRefs.current[index + 1]?.focus();
     }
   };
@@ -178,8 +178,8 @@ export default function OtpVerify() {
               className="space-y-6"
             >
               <div>
-                <div className="flex justify-between gap-1 sm:gap-2">
-                  {[0, 1, 2, 3, 4, 5].map((index) => (
+                <div className="flex justify-between gap-2 sm:gap-3">
+                  {[0, 1, 2, 3].map((index) => (
                     <div key={index} className="w-full">
                       <input
                         ref={(el) => {
@@ -187,11 +187,11 @@ export default function OtpVerify() {
                         }}
                         type="text"
                         inputMode="numeric"
-                        maxLength={6}
+                        maxLength={4}
                         value={otpValues[index]}
                         onChange={(e) => handleChange(index, e.target.value)}
                         onKeyDown={(e) => handleKeyDown(index, e)}
-                        className="w-12 aspect-square text-center text-xl font-medium border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors border-gray-300"
+                        className="w-15 aspect-square text-center text-xl font-medium border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors border-gray-300"
                         aria-label={`Digit ${index + 1} of OTP`}
                       />
                     </div>
@@ -203,7 +203,7 @@ export default function OtpVerify() {
                     animate={{ opacity: 1, y: 0 }}
                     className="mt-2 text-sm text-red-600 text-center"
                   >
-                    Please enter a valid 6-digit code
+                    Please enter a valid 4-digit code
                   </motion.p>
                 )}
               </div>
@@ -259,3 +259,4 @@ export default function OtpVerify() {
     </div>
   );
 }
+

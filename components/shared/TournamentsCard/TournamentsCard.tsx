@@ -51,3 +51,4 @@ const TournamentsCard = ({ card }: CardProps) => {
 };
 
 export default TournamentsCard;
+

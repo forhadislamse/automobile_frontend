@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
+import Loading from "@/components/shared/Loading";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -12,9 +13,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-// import { useResetPasswordMutation } from "@/redux/api/authApi";
+import { useResetPasswordMutation } from "@/redux/api/authApi";
 
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Lock } from "lucide-react";
+import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
@@ -26,7 +28,7 @@ export default function ResetPassword() {
 
   const router = useRouter();
 
-  // const [resetPassword, { isLoading }] = useResetPasswordMutation() as any;
+  const [resetPassword, { isLoading }] = useResetPasswordMutation() as any;
 
   const form = useForm<FieldValues>({
     defaultValues: {
@@ -70,21 +72,37 @@ export default function ResetPassword() {
   return (
     <div className="min-h-screen flex flex-col lg:flex-row">
       {/* Left Panel */}
-      <div className="hidden lg:flex lg:w-1/2 relative">
-        <div
-          className="w-full h-full bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: "url('/images/banner_22.jpg')",
-          }}
-        ></div>
+      <div className="w-1/2 border-r border-slate-200 relative flex flex-col justify-between bg-[url('/Lo.png')] bg-cover bg-center">
+        <div className="relative z-10">
+          <div className="mb-8 flex justify-center">
+            <Image
+              src="/r_logo.png"
+              alt="SmartAuto Logo"
+              width={200}
+              height={200}
+              className="h-52 w-52"
+            />
+          </div>
+        </div>
+
+        <div className="relative z-10 flex justify-between">
+          <Image
+            src="/images/Typing.png"
+            alt="SmartAuto Logo"
+            width={12000}
+            height={12000}
+            className="object-cover  rounded-lg"
+            priority
+          />
+        </div>
       </div>
 
       {/* Right Panel */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-10 bg-white">
         <div className="bg-white shadow-lg rounded-2xl p-8 w-full max-w-md">
           <div className="mb-8 text-center">
-            <h2 className="text-[40px] font-bold text-gray-800 mb-2">
-              Change Password
+            <h2 className="text-[30px] font-bold text-gray-800 mb-2">
+              Create a new password
             </h2>
           </div>
 
@@ -101,11 +119,12 @@ export default function ResetPassword() {
                     </FormLabel>
                     <FormControl>
                       <div className="relative">
+                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
                         <Input
                           type={showNewPassword ? "text" : "password"}
                           placeholder="Enter new password"
                           {...field}
-                          className="py-6 pr-12 rounded-2xl"
+                          className="py-6 pr-12  ps-12 rounded-2xl"
                         />
                         <button
                           type="button"
@@ -136,11 +155,12 @@ export default function ResetPassword() {
                     </FormLabel>
                     <FormControl>
                       <div className="relative">
+                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
                         <Input
                           type={showConfirmPassword ? "text" : "password"}
                           placeholder="Re-enter new password"
                           {...field}
-                          className="py-6 pr-12 rounded-2xl"
+                          className="py-6 ps-12 pr-12 rounded-2xl"
                         />
                         <button
                           type="button"
@@ -161,12 +181,13 @@ export default function ResetPassword() {
               />
 
               {/* Submit Button */}
+
               <Button
                 type="submit"
-                className="w-full bg-primary hover:bg-primary/90 rounded-lg font-medium transition-colors"
+                className="w-full bg-primary hover:bg-primary/90 rounded-lg py-6 font-medium transition-colors"
                 disabled={isSubmitting || !isPasswordMatch}
               >
-                Continue
+                {isSubmitting ? <Loading /> : "Change Password"}
               </Button>
 
               {/* Show password mismatch error */}
@@ -182,3 +203,4 @@ export default function ResetPassword() {
     </div>
   );
 }
+

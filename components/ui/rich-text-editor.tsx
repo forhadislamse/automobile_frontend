@@ -368,3 +368,4 @@ export function RichTextEditor({ value, onChange, placeholder, disabled }: RichT
     </div>
   );
 }
+

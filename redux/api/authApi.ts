@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { baseApi } from "./baseApi";
 
 export const authApi = baseApi.injectEndpoints({
@@ -19,19 +20,27 @@ export const authApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["User"],
     }),
+    socialAuth: builder.mutation({
+      query: (credentials: any) => ({
+        url: "/auth/social-login",
+        method: "POST",
+        body: credentials,
+      }),
+      invalidatesTags: ["User"],
+    }),
     forgotPassword: builder.mutation({
-      query: (data: any) => ({
+      query: (email: any) => ({
         url: "/auth/forgot-password",
         method: "POST",
-        body: data,
+        body: email,
       }),
       invalidatesTags: ["User"],
     }),
     resendOtp: builder.mutation({
-      query: (data: any) => ({
+      query: (email: any) => ({
         url: "/auth/resend-otp",
         method: "POST",
-        body: data,
+        body: email,
       }),
     }),
     verifyOtp: builder.mutation({
@@ -62,31 +71,15 @@ export const authApi = baseApi.injectEndpoints({
       }),
       providesTags: ["User"],
     }),
+    getProfile: builder.query({
+      query: () => "/users/profile",
+      providesTags: ["User"],
+    }),
     updateUser: builder.mutation({
       query: (data: any) => ({
         url: "/users/update-profile",
         method: "PUT",
         body: data,
-      }),
-      invalidatesTags: ["User"],
-    }),
-    logout: builder.mutation({
-      query: () => ({
-        url: "/auth/logout",
-        method: "POST",
-      }),
-    }),
-    verifyEmailOtp: builder.mutation({
-      query: (data: any) => ({
-        url: "/auth/verify-email-otp",
-        method: "POST",
-        body: data,
-      }),
-    }),
-    deleteUser: builder.mutation({
-      query: () => ({
-        url: "/auth/delete-user",
-        method: "DELETE",
       }),
       invalidatesTags: ["User"],
     }),
@@ -96,14 +89,13 @@ export const authApi = baseApi.injectEndpoints({
 export const {
   useLoginMutation,
   useRegisterMutation,
+  useSocialAuthMutation,
   useForgotPasswordMutation,
   useResendOtpMutation,
   useVerifyOtpMutation,
   useResetPasswordMutation,
   useChangePasswordMutation,
   useGetMeQuery,
+  useGetProfileQuery,
   useUpdateUserMutation,
-  useLogoutMutation,
-  useVerifyEmailOtpMutation,
-  useDeleteUserMutation,
 } = authApi;

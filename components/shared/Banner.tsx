@@ -26,3 +26,4 @@ const Banner = ({ imageSrc, title, subtitle }: BannerProps) => {
 };
 
 export default Banner;
+

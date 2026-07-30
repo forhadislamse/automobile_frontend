@@ -1,21 +1,23 @@
+/* eslint-disable @next/next/no-img-element */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import PHInput from "@/components/form/NRInput";
+import Loading from "@/components/shared/Loading";
 import { Button } from "@/components/ui/button";
 import { useLoginMutation } from "@/redux/api/authApi";
 import { setUser } from "@/redux/features/authSlice";
 import { useAppDispatch } from "@/redux/hooks";
-
-
+import { setCookie } from "@/src/utils/cookies";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { jwtDecode, JwtPayload } from "jwt-decode";
-import Cookies from "js-cookie";
+import { Eye, Lock, Mail } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "sonner";
+
 import z from "zod";
 
 type LoginFormValues = {
@@ -23,7 +25,7 @@ type LoginFormValues = {
   password: string;
 };
 interface CustomJwtPayload extends JwtPayload {
-  role: string; // Add the role property here
+  role: string;
 }
 
 const schema = z.object({
@@ -31,11 +33,7 @@ const schema = z.object({
   password: z.string().min(4, "Password must be at least 4 characters"),
 });
 
-import { Mail, Lock, Loader2, ShieldCheck } from "lucide-react";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-
-const LoginPage = () => {
+export default function LoginPage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const [login, { isLoading }] = useLoginMutation() as any;
@@ -52,162 +50,174 @@ const LoginPage = () => {
     try {
       const res = await login(data).unwrap();
 
+      console.log("res", res);
+
       if (res.success) {
-        const { token, refreshToken, ...userProps } = res.data;
+        const token = res.data.token;
 
+        setCookie(token);
 
-        const user = {
-          id: userProps.id,
-          email: userProps.email,
-          role: userProps.role,
-          fullName: userProps.fullName,
-          profileImage: userProps.profileImage,
-        };
+        const user = jwtDecode<CustomJwtPayload>(token);
 
-        Cookies.set("token", token, { expires: 7 }); // Set cookie on client side
         dispatch(setUser({ token, user }));
 
         toast.success(res.message || "Login successful!");
 
-        if (user.role === "ADMIN") {
+        if (user?.role === "ADMIN") {
           router.push("/admin/dashboard");
-        } else if (user.role === "TECHNICIAN") {
-          router.push("/user/diagnostics");
-        } else if (user.role === "USER") {
-          router.push("/user");
-        } else {
-          router.push("/");
+        } else if (user?.role === "USER") {
+          router.push("/shop-owner/dashboard");
+        } else if (user?.role === "TECHNICIAN") {
+          router.push("/chat");
         }
+      } else {
+        toast.error(res.message || "Login failed");
       }
     } catch (error: any) {
-      toast.error(error?.data?.message || "Login failed. Please check your credentials.");
+      toast.error(error?.data?.message || "Something went wrong");
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="flex w-full max-w-6xl items-center gap-10 lg:gap-24">
-        {/* Left Side: Branding */}
-        <div className="hidden lg:flex flex-1 items-center justify-center bg-[#0a1628] rounded-[2.5rem] min-h-[85vh] relative overflow-hidden group">
-          <div className="absolute inset-0 bg-blue-600/5 backdrop-blur-3xl animate-pulse" />
-          <div className="relative z-10 text-center animate-in fade-in zoom-in duration-700">
-             <Image
-                src="/logo2.png"
-                alt="Logo"
-                width={280}
-                height={280}
-                className="object-contain transition-transform duration-500 group-hover:scale-105"
-                priority
-              />
-              <div className="mt-8">
-                 <h2 className="text-white text-3xl font-black tracking-tighter uppercase italic">
-                   SmartAuto<span className="text-blue-500">Tech</span>
-                 </h2>
-                 <p className="text-gray-400 font-medium tracking-[0.3em] text-[10px] mt-2">AI DRIVEN DIAGNOSTICS</p>
-              </div>
+    <div className="min-h-screen bg-linear-to-b bg-white flex flex-col lg:flex-row">
+      {/* Left Sidebar */}
+      <div className="relative flex min-h-[320px] flex-col justify-center overflow-hidden border-b border-slate-200 lg:min-h-screen lg:w-1/2 lg:border-b-0 lg:border-r">
+        {/* Background Image with subtle overlay */}
+        {/* <div className="absolute inset-0 bg-[url('/Lo.png')] bg-cover bg-center"></div> */}
+        {/* <div className="absolute inset-0 bg-black/25"></div> */}
+
+        {/* Content */}
+        <div className="relative z-10 flex flex-col items-center justify-center space-y-5 px-6 py-6 lg:space-y-6 lg:py-10">
+          {/* Logo */}
+          {/* <Image
+            src="/r_logo.png"
+            alt="SmartAuto Logo"
+            width={180}
+            height={180}
+            className="h-48 w-48 rounded-full shadow-lg animate-bounce"
+          /> */}
+
+          {/* Lottie Animation */}
+          <div className="w-full max-w-[560px]">
+            {/* <Lottie
+              animationData={animationData}
+              loop
+              autoplay
+              className="w-full h-full"
+            /> */}
+            <img
+              src="/video/video.gif"
+              alt="animation"
+              width={500}
+              height={500}
+              className="mx-auto h-[220px] w-full object-contain sm:h-[300px] lg:h-[420px] xl:h-[500px]"
+            />
           </div>
+
+          <Link href="https://smartautotech.shop/LoginDoc" target="_blank" className="w-full max-w-xs">
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full gap-2 py-5 font-medium"
+            >
+              <Eye size={16} />
+              Quick Start Guide
+            </Button>
+          </Link>
         </div>
+      </div>
 
-        {/* Right Side: Form */}
-        <div className="w-full max-w-md animate-in fade-in slide-in-from-right-8 duration-500">
-          <div className="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-2xl border border-gray-100">
-            <div className="mb-10">
-              <h1 className="text-3xl font-black text-[#0a1628] tracking-tight mb-3">Welcome Back !</h1>
-              <p className="text-gray-400 font-medium text-sm leading-relaxed">
-                Don't have an account? <Link href="/shop-onboarding" className="text-blue-500 hover:underline font-bold">Sign Up</Link>
-              </p>
+      <div className="flex w-full items-center justify-center p-6 sm:p-8 lg:w-1/2">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-8">
+            <div className="flex justify-center mb-4">
+              <div className="text-primary text-5xl">
+                <Link href="/">
+                  <Image
+                    src="/r_logo.png"
+                    alt="SmartAuto Logo"
+                    width={180}
+                    height={180}
+                    className="h-48 w-48 object-contain"
+                  />
+                </Link>
+              </div>
             </div>
 
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 block">
-                        Email Account
-                      </FormLabel>
-                      <FormControl>
-                        <div className="relative group">
-                          <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300 transition-colors group-focus-within:text-blue-500" />
-                          <Input
-                            type="email"
-                            placeholder="Enter your email"
-                            {...field}
-                            className="py-7 pl-12 rounded-2xl bg-gray-50/50 border-gray-100 focus:bg-white focus:ring-4 focus:ring-blue-50 transition-all font-medium"
-                          />
-                        </div>
-                      </FormControl>
-                      <FormMessage className="text-[10px] font-bold" />
-                    </FormItem>
-                  )}
-                />
+            <h1 className="text-2xl font-bold text-slate-900 mb-2">
+              Welcome Back
+            </h1>
+            <p className="text-[#4B5563] text-[16px]">
+              Don&apos;t have an account?{" "}
+              <Link
+                href="/register"
+                className="text-[#4B5563] font-semibold hover:text-[#4B5563]/80"
+              >
+                Sign Up
+              </Link>
+            </p>
+          </div>
 
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <div className="flex items-center justify-between mb-2">
-                        <FormLabel className="text-[10px] font-black uppercase tracking-widest text-gray-400 block">
-                          Password
-                        </FormLabel>
-                        <Link
-                          href="/forgot-password"
-                          className="text-[10px] font-black text-blue-500 hover:text-blue-600 uppercase tracking-widest transition-colors"
-                        >
-                          Forgot Password?
-                        </Link>
-                      </div>
-                      <FormControl>
-                        <div className="relative group">
-                          <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300 transition-colors group-focus-within:text-blue-500" />
-                          <Input
-                            type="password"
-                            placeholder="Enter your password"
-                            {...field}
-                            className="py-7 pl-12 rounded-2xl bg-gray-50/50 border-gray-100 focus:bg-white focus:ring-4 focus:ring-blue-50 transition-all font-medium"
-                          />
-                        </div>
-                      </FormControl>
-                      <FormMessage className="text-[10px] font-bold" />
-                    </FormItem>
-                  )}
-                />
-
-                <div className="flex items-center gap-3 py-2">
-                   <div className="flex items-center gap-2">
-                      <input type="checkbox" id="remember" className="w-4 h-4 rounded border-gray-300 text-blue-500 focus:ring-blue-500" />
-                      <label htmlFor="remember" className="text-xs font-bold text-gray-400 uppercase tracking-widest cursor-pointer">Remember me</label>
-                   </div>
-                </div>
-
-                <Button
-                  type="submit"
-                  className="w-full py-8 rounded-2xl bg-[#0a1628] hover:bg-gray-800 text-white font-black text-lg uppercase tracking-widest shadow-2xl shadow-blue-900/20 transition-all active:scale-[0.98]"
-                  disabled={isLoading}
+          <FormProvider {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <PHInput
+                control={form.control}
+                name="email"
+                label="Email"
+                icon={Mail}
+                type="email"
+                placeholder="Enter your email"
+              />
+              <PHInput
+                control={form.control}
+                name="password"
+                label="Password"
+                icon={Lock}
+                type="password"
+                placeholder="Enter your password"
+              />
+              <div className="flex justify-end">
+                <Link
+                  href="/forgot-password"
+                  className="text-sm font-semibold text-primary hover:underline"
                 >
-                  {isLoading ? (
-                    <div className="flex items-center gap-2">
-                       <Loader2 className="animate-spin" /> Signing In...
-                    </div>
-                  ) : "Sign In"}
-                </Button>
-              </form>
-            </Form>
+                  Forgot password?
+                </Link>
+              </div>
 
-            <div className="mt-12 text-center">
-               <p className="text-[9px] font-bold text-gray-300 uppercase tracking-[0.2em] leading-relaxed">
-                 By clicking sign in, you agree to our <br />
-                 <Link href="#" className="text-gray-400 hover:text-blue-500 transition-colors underline decoration-1 underline-offset-4">Terms of Services</Link> and <Link href="#" className="text-gray-400 hover:text-blue-500 transition-colors underline decoration-1 underline-offset-4">Privacy Policy</Link>
-               </p>
-            </div>
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="w-full py-6 font-semibold"
+              >
+                {isLoading ? <Loading /> : "Sign In"}
+              </Button>
+
+            </form>
+          </FormProvider>
+
+          {/* Terms & Privacy */}
+          <div className="flex justify-center w-full">
+            <p className="text-xs text-slate-600 text-center mt-6">
+              By signing up, you agree to our{" "}
+              <Link
+                href="/terms-of-use"
+                className="text-primary hover:text-blue-700 font-medium"
+              >
+                Terms of Service
+              </Link>{" "}
+              and{" "}
+              <Link
+                href="/privacy-policy"
+                className="text-primary hover:text-blue-700 font-medium"
+              >
+                Privacy Policy
+              </Link>
+            </p>
           </div>
         </div>
       </div>
     </div>
   );
-};
+}
 
-export default LoginPage;
