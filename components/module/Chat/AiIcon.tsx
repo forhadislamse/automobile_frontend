@@ -69,7 +69,7 @@ const AiIcon = () => {
         >
           <stop stop-color="#FFBCBC" />
           <stop offset="0.397152" stop-color="#AE2222" />
-          <stop offset="0.997468" stop-color="#FF6B00" />
+          <stop offset="0.997468" stop-color="#7E0A0A" />
         </linearGradient>
         <linearGradient
           id="paint1_linear_180_21495"
@@ -80,7 +80,7 @@ const AiIcon = () => {
           gradientUnits="userSpaceOnUse"
         >
           <stop stop-color="#8FB0ED" />
-          <stop offset="0.397152" stop-color="#FF6B00" />
+          <stop offset="0.397152" stop-color="#1B4697" />
           <stop offset="0.997468" stop-color="#042055" />
         </linearGradient>
       </defs>
@@ -89,4 +89,3 @@ const AiIcon = () => {
 };
 
 export default AiIcon;
-

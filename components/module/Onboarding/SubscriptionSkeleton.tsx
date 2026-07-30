@@ -110,4 +110,3 @@ const SubscriptionSkeleton = () => {
 };
 
 export default SubscriptionSkeleton;
-

@@ -82,4 +82,3 @@ const CustomersTable = ({ recentUsers }: { recentUsers: RecentUser[] }) => {
 };
 
 export default CustomersTable;
-

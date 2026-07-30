@@ -78,16 +78,16 @@ const WhatYouGet = () => {
           <div className="w-full lg:w-1/2 order-2 lg:order-1">
             <motion.span
               variants={itemVariants}
-              className="text-[#FF6B00] font-bold tracking-[0.2em] uppercase text-sm mb-4 block"
+              className="text-[#8B2323] font-bold tracking-[0.2em] uppercase text-sm mb-4 block"
             >
               The Package
             </motion.span>
             <motion.h2
               variants={itemVariants}
-              className="text-[36px] md:text-[54px] font-bold text-[#0F172A] leading-[1.1] mb-8"
+              className="text-[36px] md:text-[54px] font-bold text-[#0D2B1D] leading-[1.1] mb-8"
             >
               Everything You Need to <br />
-              <span className="text-[#FF6B00]">Regain Control</span>
+              <span className="text-[#8B2323]">Regain Control</span>
             </motion.h2>
 
             <motion.p
@@ -106,11 +106,11 @@ const WhatYouGet = () => {
                   whileHover={{ x: 10 }}
                   className="flex gap-6 group cursor-default"
                 >
-                  <div className="shrink-0 w-12 h-12 bg-[#0F172A] rounded-2xl flex items-center justify-center shadow-lg group-hover:bg-[#FF6B00] transition-colors duration-300">
+                  <div className="shrink-0 w-12 h-12 bg-[#0D2B1D] rounded-2xl flex items-center justify-center shadow-lg group-hover:bg-[#8B2323] transition-colors duration-300">
                     {benefit.icon}
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-[#0F172A] mb-2 group-hover:text-[#FF6B00] transition-colors duration-300">
+                    <h3 className="text-xl font-bold text-[#0D2B1D] mb-2 group-hover:text-[#8B2323] transition-colors duration-300">
                       {benefit.title}
                     </h3>
                     <p className="text-gray-500 leading-relaxed">
@@ -160,4 +160,3 @@ const WhatYouGet = () => {
 };
 
 export default WhatYouGet;
-

@@ -124,4 +124,3 @@ export default function BillableHours() {
     </motion.div>
   );
 }
-

@@ -136,4 +136,3 @@ const AssistantsCard = () => {
 };
 
 export default AssistantsCard;
-

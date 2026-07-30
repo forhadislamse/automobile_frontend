@@ -259,4 +259,3 @@ export default function Otp() {
     </div>
   );
 }
-

@@ -20,4 +20,3 @@ const CarIcon = () => {
 };
 
 export default CarIcon;
-

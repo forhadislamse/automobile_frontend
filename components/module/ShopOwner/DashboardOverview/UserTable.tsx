@@ -78,4 +78,3 @@ const CustomersTable = ({
 };
 
 export default CustomersTable;
-

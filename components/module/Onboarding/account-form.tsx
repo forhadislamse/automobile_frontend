@@ -142,4 +142,3 @@ export function AccountForm({ planId, paymentId, clientSecret }: Props) {
     </Card>
   );
 }
-

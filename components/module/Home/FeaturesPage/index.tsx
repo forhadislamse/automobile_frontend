@@ -10,7 +10,7 @@ export default function FeaturesSection() {
         <div className="flex justify-between items-center container mx-auto text-center">
           <div>
             <div className="flex items-center justify-start gap-2 mb-4 sm:mb-6">
-              <span className=" sm:text-sm font-medium text-[#FF6B00] text-sm uppercase ">
+              <span className=" sm:text-sm font-medium text-[#7E0A0A] text-sm uppercase ">
                 WHAT YOU GET
               </span>
             </div>
@@ -42,4 +42,3 @@ export default function FeaturesSection() {
     </main>
   );
 }
-

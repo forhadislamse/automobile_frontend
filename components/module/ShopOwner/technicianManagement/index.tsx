@@ -149,4 +149,3 @@ const TechnicianManagement = () => {
 };
 
 export default TechnicianManagement;
-

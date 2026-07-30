@@ -111,13 +111,13 @@ const TheSolution = () => {
           >
             <motion.span
               variants={itemVariants}
-              className="text-[#FF6B00] text-sm font-medium uppercase xl:tracking-wider mb-4 block"
+              className="text-[#7E0A0A] text-sm font-medium uppercase xl:tracking-wider mb-4 block"
             >
               THE SOLUTION
             </motion.span>
             <motion.h2
               variants={itemVariants}
-              className="text-[24px] md:text-[36px] lg:text-[48px] font-bold text-[#0F172A] leading-[1.1] mb-8"
+              className="text-[24px] md:text-[36px] lg:text-[48px] font-bold text-[#0D2B1D] leading-[1.1] mb-8"
             >
               A Master Technician That Never Leaves the Bay
             </motion.h2>
@@ -143,7 +143,7 @@ const TheSolution = () => {
                   variants={itemVariants}
                   className="flex items-center gap-3"
                 >
-                  <div className="bg-[#FF6B00] p-1 rounded-full">
+                  <div className="bg-[#8B2323] p-1 rounded-full">
                     <Check className="w-4 h-4 text-white" />
                   </div>
                   <span className="text-gray-700 font-medium md:text-lg">
@@ -160,4 +160,3 @@ const TheSolution = () => {
 };
 
 export default TheSolution;
-

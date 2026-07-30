@@ -203,4 +203,3 @@ export default function ShopOwnerChangePasswordPage() {
     </div>
   );
 }
-

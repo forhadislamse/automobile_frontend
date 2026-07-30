@@ -133,4 +133,3 @@ export function BookingAndPaymentForm({
     </div>
   );
 }
-

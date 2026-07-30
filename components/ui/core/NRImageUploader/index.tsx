@@ -55,4 +55,3 @@ const NRImageUploader = ({
 };
 
 export default NRImageUploader;
-

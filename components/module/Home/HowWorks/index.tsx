@@ -41,10 +41,10 @@ const HowWorks = () => {
           {/* Left Column */}
           <div className="lg:w-1/2 space-y-10">
             <div className="space-y-6">
-              <span className="text-[#FF6B00] text-sm font-medium uppercase  tracking-wider">
+              <span className="text-[#7E0A0A] text-sm font-medium uppercase  tracking-wider">
                 HOW IT WORKS
               </span>
-              <h2 className="text-2xl lg:text-[48px] mb-6 font-semibold text-[#0F172A] leading-[1.05] tracking-tight">
+              <h2 className="text-2xl lg:text-[48px] mb-6 font-semibold text-[#14261C] leading-[1.05] tracking-tight">
                 Simple. Fast. Built for the Shop Floor.
               </h2>
               <p className="text-[20px] text-[#4F5655] mb-6 max-w-lg leading-relaxed">
@@ -58,7 +58,7 @@ const HowWorks = () => {
               href="/register"
               className="group relative flex items-center justify-start gap-2 overflow-hidden rounded-lg bg-white  py-4 text-base font-bold text-primary transition-all"
             >
-              <Button className="bg-[#FF6B00] hover:bg-[#E66000] text-white h-14 w-50 px-14 text-lg rounded-xl flex items-center gap-2 group shadow-xl shadow-blue-900/10 transition-all">
+              <Button className="bg-[#0A2149] hover:bg-[#081a3a] text-white h-14 w-50 px-14 text-lg rounded-xl flex items-center gap-2 group shadow-xl shadow-blue-900/10 transition-all">
                 <span className="relative z-10">Start a Diagnosis</span>
                 <ArrowUpRight className="relative z-10 h-5 w-5 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
               </Button>
@@ -101,16 +101,16 @@ const HowWorks = () => {
                   className={`p-6 rounded-4xl transition-all duration-300 cursor-pointer border-b-4 
                     ${
                       isHighlighted
-                        ? "bg-[#f9f9f9] border-[#FF6B00]"
+                        ? "bg-[#f9f9f9] border-[#0d2f6f]"
                         : "bg-transparent border-transparent hover:bg-[#f9f9f9]/50"
                     }`}
                 >
                   <div className="space-y-4">
-                    <p className="text-[#FF6B00] text-[20px] mb-6">
+                    <p className="text-[#1B4697] text-[20px] mb-6">
                       Step {index + 1}
                     </p>
                     <div className="space-y-2">
-                      <h3 className="text-[20px] font-bold text-[#0F172A]">
+                      <h3 className="text-[20px] font-bold text-[#14261C]">
                         {step.title}
                       </h3>
                       <p className="text-[16px] text-[#4F5655]">
@@ -129,4 +129,3 @@ const HowWorks = () => {
 };
 
 export default HowWorks;
-

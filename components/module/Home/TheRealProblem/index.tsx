@@ -35,13 +35,13 @@ const TheRealProblem = () => {
         <div className="lg:w-3/5">
           <motion.p
             variants={itemVariants}
-            className="text-[#FF6B00] text-sm font-medium uppercase tracking-widest mb-3"
+            className="text-[#7E0A0A] text-sm font-medium uppercase tracking-widest mb-3"
           >
             The real problem
           </motion.p>
           <motion.h2
             variants={itemVariants}
-            className="text-[#0F172A] text-3xl font-extrabold sm:text-4xl lg:text-5xl leading-tight"
+            className="text-[#14261C] text-3xl font-extrabold sm:text-4xl lg:text-5xl leading-tight"
           >
             Most Shops Don’t Have a <br className="hidden lg:block" />
             Diagnostic Problem.
@@ -77,4 +77,3 @@ const TheRealProblem = () => {
 };
 
 export default TheRealProblem;
-

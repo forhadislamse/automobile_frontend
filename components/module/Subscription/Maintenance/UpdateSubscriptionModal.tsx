@@ -332,4 +332,3 @@ export function UpdateSubscriptionModal({
     </Dialog>
   );
 }
-

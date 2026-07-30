@@ -173,4 +173,3 @@ const SubscriptionTable = () => {
 };
 
 export default SubscriptionTable;
-

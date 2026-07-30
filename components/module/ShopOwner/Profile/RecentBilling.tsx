@@ -204,4 +204,3 @@ const BillingTable = () => {
 };
 
 export default BillingTable;
-

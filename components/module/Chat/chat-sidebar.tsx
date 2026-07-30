@@ -134,4 +134,3 @@ export function ChatSidebar({ onClose }: ChatSidebarProps) {
     </div>
   );
 }
-

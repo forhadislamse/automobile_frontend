@@ -31,4 +31,3 @@ const AiIcon = () => {
 };
 
 export default AiIcon;
-

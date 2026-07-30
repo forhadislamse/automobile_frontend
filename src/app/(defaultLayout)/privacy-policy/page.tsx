@@ -434,4 +434,3 @@ function Label({ children, className, ...props }: React.ComponentPropsWithoutRef
     </label>
   );
 }
-

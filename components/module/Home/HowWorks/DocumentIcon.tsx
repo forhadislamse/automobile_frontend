@@ -18,4 +18,3 @@ const DocumentIcon = () => {
 };
 
 export default DocumentIcon;
-

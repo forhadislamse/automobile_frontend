@@ -103,4 +103,3 @@ const SubscriptionTable = ({ maintenance }: { maintenance: any }) => {
 };
 
 export default SubscriptionTable;
-

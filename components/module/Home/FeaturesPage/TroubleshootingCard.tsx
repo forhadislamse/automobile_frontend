@@ -83,4 +83,3 @@ const TroubleshootingCard = () => {
 };
 
 export default TroubleshootingCard;
-

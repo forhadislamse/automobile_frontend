@@ -34,7 +34,7 @@ const DashboardOverview = () => {
     {
       title: "Active Shops",
       value: topStats?.activeShops || 0,
-      icon: <Store className="text-[#FF6B00]" />,
+      icon: <Store className="text-[#7E0A0A]" />,
       bg: "bg-[#fff8f8]",
     },
     {
@@ -96,4 +96,3 @@ const DashboardOverview = () => {
 };
 
 export default DashboardOverview;
-

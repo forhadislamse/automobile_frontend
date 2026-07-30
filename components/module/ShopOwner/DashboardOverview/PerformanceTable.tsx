@@ -55,4 +55,3 @@ const PerformanceTable = ({ performanceTable }: PerformanceTableProps) => {
 };
 
 export default PerformanceTable;
-

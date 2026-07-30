@@ -34,4 +34,3 @@ const MetricCard = ({ metrics }: MetricCardProps) => {
 };
 
 export default MetricCard;
-

@@ -877,4 +877,3 @@ const DiagnosticChatSession = () => {
 };
 
 export default DiagnosticChatSession;
-

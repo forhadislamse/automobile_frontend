@@ -81,4 +81,3 @@ const ShopOwnerCard = () => {
 };
 
 export default ShopOwnerCard;
-

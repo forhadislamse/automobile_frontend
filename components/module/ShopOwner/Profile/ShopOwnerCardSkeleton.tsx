@@ -56,4 +56,3 @@ const ShopOwnerCardSkeleton = () => {
 };
 
 export default ShopOwnerCardSkeleton;
-

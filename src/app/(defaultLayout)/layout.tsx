@@ -17,4 +17,3 @@ const CommonLayout = async ({ children }: { children: React.ReactNode }) => {
 };
 
 export default CommonLayout;
-

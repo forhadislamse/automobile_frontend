@@ -71,4 +71,3 @@ const RecentBilling = ({ recentBilling }: { recentBilling: any[] }) => {
 };
 
 export default RecentBilling;
-

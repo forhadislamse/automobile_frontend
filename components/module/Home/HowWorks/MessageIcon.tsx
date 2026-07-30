@@ -23,4 +23,3 @@ const MessageIcon = () => {
 };
 
 export default MessageIcon;
-

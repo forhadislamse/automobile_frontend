@@ -135,13 +135,13 @@ const ShopEconomics = () => {
           >
             <motion.span
               variants={textItemVariants}
-              className="text-[#FF6B00] font-medium tracking-wider uppercase text-sm mb-4 block"
+              className="text-[#7E0A0A] font-medium tracking-wider uppercase text-sm mb-4 block"
             >
               Shop Economics
             </motion.span>
             <motion.h2
               variants={textItemVariants}
-              className="text-[32px] md:text-[40px] lg:text-[48px] font-bold text-[#0F172A] leading-[1.1] mb-8"
+              className="text-[32px] md:text-[40px] lg:text-[48px] font-bold text-[#0D2B1D] leading-[1.1] mb-8"
             >
               What Is 10 Minutes Per Car Worth
             </motion.h2>
@@ -151,7 +151,7 @@ const ShopEconomics = () => {
             >
               <p>
                 If you save just{" "}
-                <span className="font-semibold text-[#0F172A]">10 minutes</span>{" "}
+                <span className="font-semibold text-[#0D2B1D]">10 minutes</span>{" "}
                 per vehicle:
               </p>
             </motion.div>
@@ -165,7 +165,7 @@ const ShopEconomics = () => {
                   whileHover={{ x: 10 }}
                   className="flex items-center gap-4 group cursor-default"
                 >
-                  <div className="bg-[#FF6B00] p-1.5 rounded-full shadow-sm group-hover:scale-110 transition-transform">
+                  <div className="bg-[#8B2323] p-1.5 rounded-full shadow-sm group-hover:scale-110 transition-transform">
                     <Check className="w-4 h-4 text-white" />
                   </div>
                   <span className="text-gray-700 font-medium md:text-xl">
@@ -189,4 +189,3 @@ const ShopEconomics = () => {
 };
 
 export default ShopEconomics;
-

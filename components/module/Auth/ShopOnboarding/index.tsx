@@ -110,7 +110,7 @@ export default function ShopOnboarding() {
                 </div>
               ) : (
                 <Step2_PlanSelection 
-                  plans={plansData?.data || []} 
+                  plans={(plansData as any)?.data || []} 
                   onNext={nextStep} 
                   onBack={prevStep} 
                 />

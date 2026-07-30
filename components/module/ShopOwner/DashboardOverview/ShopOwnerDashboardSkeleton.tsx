@@ -110,4 +110,3 @@ const ShopOwnerDashboardSkeleton = () => {
 };
 
 export default ShopOwnerDashboardSkeleton;
-

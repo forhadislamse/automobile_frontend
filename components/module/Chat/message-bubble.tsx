@@ -73,4 +73,3 @@ export function MessageBubble({ message }: { message: Message }) {
     </div>
   );
 }
-

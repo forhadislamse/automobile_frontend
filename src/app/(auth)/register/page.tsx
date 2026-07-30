@@ -391,4 +391,3 @@ export default function ShopSetupPage() {
     </OnboardingProvider>
   );
 }
-

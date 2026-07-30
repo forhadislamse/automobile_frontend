@@ -60,4 +60,3 @@ const ActionCell = ({ id }: any) => {
 };
 
 export default ActionCell;
-

@@ -76,7 +76,7 @@ export default function FAQ() {
               viewport={{ once: true }}
               className="flex items-center justify-start gap-3 mb-6"
             >
-              <span className="text-sm text-[#FF6B00] font-medium uppercase  tracking-[0.2em]">
+              <span className="text-sm text-[#7E0A0A] font-medium uppercase  tracking-[0.2em]">
                 FAQ
               </span>
             </motion.div>
@@ -165,4 +165,3 @@ export default function FAQ() {
     </section>
   );
 }
-

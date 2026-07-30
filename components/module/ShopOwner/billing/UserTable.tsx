@@ -211,4 +211,3 @@ const BillingTable = ({ billing }: { billing: BillingItem[] }) => {
 };
 
 export default BillingTable;
-

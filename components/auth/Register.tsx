@@ -51,7 +51,7 @@ export default function Register() {
         gender: "Male" // default for now if not in form
       };
       
-      const res = await registerUser(payload).unwrap();
+      const res = await registerUser(payload).unwrap() as any;
       if (res?.success || res?.token) {
         toast.success("Account created successfully!");
         setStep(2); // Move to Verification step

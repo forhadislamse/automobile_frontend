@@ -142,4 +142,3 @@ const ExampleTable = () => {
 };
 
 export default ExampleTable;
-

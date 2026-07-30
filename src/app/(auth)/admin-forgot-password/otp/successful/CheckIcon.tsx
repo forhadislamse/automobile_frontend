@@ -202,4 +202,3 @@ const CheckIcon = () => {
 };
 
 export default CheckIcon;
-

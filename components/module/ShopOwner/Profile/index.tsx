@@ -20,4 +20,3 @@ const ShopOwnerProfile = () => {
 };
 
 export default ShopOwnerProfile;
-

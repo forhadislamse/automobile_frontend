@@ -123,10 +123,10 @@ export default function PricingPage() {
       <div className="pt-12 sm:pt-16 pb-10 sm:pb-12 text-center mb-10 sm:mb-16 px-4">
         <div className="container mx-auto flex justify-between items-center">
           <div className="text-left">
-            <span className="sm:text-sm text-[#FF6B00] text-sm font-medium uppercase ">
+            <span className="sm:text-sm text-[#7E0A0A] text-sm font-medium uppercase ">
               Pricing
             </span>
-            <h1 className="text-3xl text-start sm:text-4xl lg:text-[48px]  font-bold mb-4 leading-tight text-[#0F172A]">
+            <h1 className="text-3xl text-start sm:text-4xl lg:text-[48px]  font-bold mb-4 leading-tight text-[#14261C]">
               Simple, Transparent Pricing
               <br />
               Built for Repair Shops
@@ -159,4 +159,3 @@ export default function PricingPage() {
     </main>
   );
 }
-

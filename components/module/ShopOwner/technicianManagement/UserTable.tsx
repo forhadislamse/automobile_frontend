@@ -82,4 +82,3 @@ const TechniciansTable = ({ technicians }: { technicians: Technician[] }) => {
 };
 
 export default TechniciansTable;
-

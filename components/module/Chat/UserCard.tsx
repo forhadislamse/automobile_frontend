@@ -88,4 +88,3 @@ const TechnicianCard = () => {
 };
 
 export default TechnicianCard;
-

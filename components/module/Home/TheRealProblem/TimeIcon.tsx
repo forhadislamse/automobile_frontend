@@ -20,4 +20,3 @@ const TimeIcon = () => {
 };
 
 export default TimeIcon;
-

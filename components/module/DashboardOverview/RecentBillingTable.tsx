@@ -98,4 +98,3 @@ const RecentBillingTable = ({
 };
 
 export default RecentBillingTable;
-

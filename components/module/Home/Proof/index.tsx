@@ -153,10 +153,10 @@ const Proof = () => {
           {/* Left Side: Header Content */}
           <div className="space-y-6">
             <motion.div variants={itemVariants}>
-              <span className="text-[#FF6B00] font-medium  tracking-[0.2em] uppercase text-sm mb-4 block">
+              <span className="text-[#7E0A0A] font-medium  tracking-[0.2em] uppercase text-sm mb-4 block">
                 The Proof
               </span>
-              <h2 className="text-[36px] md:text-[48px] font-bold text-[#0F172A] leading-[1.1] mb-6">
+              <h2 className="text-[36px] md:text-[48px] font-bold text-[#0D2B1D] leading-[1.1] mb-6">
                 One Avoided Comeback <br />
                 <span className="">Pays for This</span>
               </h2>
@@ -180,10 +180,10 @@ const Proof = () => {
                 whileHover={{ x: 8 }}
                 className="flex items-center gap-4 group"
               >
-                <div className="shrink-0 bg-[#FF6B00] p-1.5 rounded-full shadow-md group-hover:scale-110 transition-transform duration-300">
+                <div className="shrink-0 bg-[#8B2323] p-1.5 rounded-full shadow-md group-hover:scale-110 transition-transform duration-300">
                   <Check className="w-4 h-4 text-white" />
                 </div>
-                <span className="text-[17px] text-[#0F172A] font-medium group-hover:text-[#FF6B00] transition-colors duration-300">
+                <span className="text-[17px] text-[#14261C] font-medium group-hover:text-[#8B2323] transition-colors duration-300">
                   {item}
                 </span>
               </motion.div>
@@ -208,8 +208,8 @@ const Proof = () => {
           >
             <div className="flex justify-end items-end mb-10">
               <div className="flex gap-3">
-                <CarouselPrevious className="static translate-y-0 bg-white hover:bg-[#FF6B00] hover:text-white transition-all duration-300 border-gray-200 shadow-sm size-12" />
-                <CarouselNext className="static translate-y-0 bg-white hover:bg-[#FF6B00] hover:text-white transition-all duration-300 border-gray-200 shadow-sm size-12" />
+                <CarouselPrevious className="static translate-y-0 bg-white hover:bg-[#8B2323] hover:text-white transition-all duration-300 border-gray-200 shadow-sm size-12" />
+                <CarouselNext className="static translate-y-0 bg-white hover:bg-[#8B2323] hover:text-white transition-all duration-300 border-gray-200 shadow-sm size-12" />
               </div>
             </div>
 
@@ -228,7 +228,7 @@ const Proof = () => {
                     className="bg-white p-8 rounded-4xl border border-gray-100 shadow-sm relative group transition-all duration-300 h-full flex flex-col"
                   >
                     <div className="absolute top-6 right-8 opacity-10 group-hover:opacity-20 transition-opacity">
-                      <Quote size={48} className="text-[#0F172A]" />
+                      <Quote size={48} className="text-[#0D2B1D]" />
                     </div>
 
                     <div className="mb-6 grow">
@@ -248,7 +248,7 @@ const Proof = () => {
                         />
                       </div>
                       <div>
-                        <p className="text-[19px] text-[#0F172A] font-bold">
+                        <p className="text-[19px] text-[#0D2B1D] font-bold">
                           {review.name}
                         </p>
                         <p className="text-[15px] text-gray-500 font-medium">
@@ -277,4 +277,3 @@ const Proof = () => {
 };
 
 export default Proof;
-

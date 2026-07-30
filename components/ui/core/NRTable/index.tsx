@@ -83,4 +83,3 @@ export function RWTable<TData, TValue>({
     </div>
   );
 }
-

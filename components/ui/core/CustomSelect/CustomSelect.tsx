@@ -35,4 +35,3 @@ export const CustomSelect = ({
     </SelectContent>
   </Select>
 );
-

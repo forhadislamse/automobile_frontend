@@ -69,4 +69,3 @@ const NRDatePicker = ({ name, label, control }: NRDatePickerProps) => {
 };
 
 export default NRDatePicker;
-

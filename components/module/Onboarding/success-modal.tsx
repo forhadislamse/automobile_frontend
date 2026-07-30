@@ -83,4 +83,3 @@ export function SuccessModal({ open, onClose }: SuccessModalProps) {
     </div>
   );
 }
-

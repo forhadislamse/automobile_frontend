@@ -379,4 +379,3 @@ const ShopManagementTable = () => {
 };
 
 export default ShopManagementTable;
-

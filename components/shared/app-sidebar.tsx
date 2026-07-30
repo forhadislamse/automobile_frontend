@@ -116,4 +116,3 @@ export default function AppSidebar({ role, ...props }: AppSidebarProps) {
     </Sidebar>
   );
 }
-

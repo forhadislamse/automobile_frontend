@@ -36,7 +36,7 @@ export default function Login() {
 
   const onSubmit = async (data: LoginFormValues) => {
     try {
-      const res = await login(data).unwrap();
+      const res = await login(data).unwrap() as any;
       if (res?.success || res?.token) {
         dispatch(
           setUser({
