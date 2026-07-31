@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://automobile-frontend-six.vercel.app/Logo.png" alt="SmartAutoTech Logo" width="120" />
+  <img src="https://automobile-frontend-six.vercel.app/r_logo.png" alt="SmartAutoTech Logo" width="120" />
 
   <br/>
   <br/>
