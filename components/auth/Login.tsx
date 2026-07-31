@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Link } from "next-view-transitions";
+import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -74,7 +74,7 @@ export default function Login() {
           <div className="mb-6 w-48 h-auto">
             <Image 
               src="/Logo.png" 
-              alt="NextGen AutoTech Logo" 
+              alt="SmartAutoTech Logo" 
               width={200} 
               height={60} 
               className="object-contain mx-auto"

@@ -369,13 +369,13 @@ export default function Navbar() {
               <Link href="/login" onClick={() => setSidebarOpen(false)}>
                 <Button
                   variant="outline"
-                  className="w-full py-5 text-base border-[#e5c98a] bg-white hover:bg-gray-50"
+                  className="w-full py-5 text-base border-[#042055] bg-white hover:bg-gray-50"
                 >
                   Login
                 </Button>
               </Link>
               <Link href="/register" onClick={() => setSidebarOpen(false)}>
-                <Button className="w-full gap-2 py-5 text-base font-semibold bg-[#d99b35] hover:bg-[#c7871f] text-white">
+                <Button className="w-full gap-2 py-5 text-base font-semibold bg-[#042055] hover:bg-[#03173d] text-white">
                   Get started <ArrowUpRight size={18} strokeWidth={2.5} />
                 </Button>
               </Link>

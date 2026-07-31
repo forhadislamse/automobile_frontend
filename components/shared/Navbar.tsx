@@ -31,7 +31,7 @@ const Navbar = () => {
                         <LogoIcon className="w-10 h-10 md:w-12 md:h-12" />
                     </div>
                     <span className="text-xl md:text-2xl font-bold tracking-tight text-gray-900 hidden sm:block">
-                        NextGen <span className="text-[#FF6B00]">AutoTech</span>
+                        Smart <span className="text-[#042055]">AutoTech</span>
                     </span>
                 </Link>
 
@@ -41,7 +41,7 @@ const Navbar = () => {
                         <Link 
                             key={link.name}
                             href={link.href}
-                            className="text-[15px] font-medium text-gray-600 hover:text-[#FF6B00] transition-colors"
+                            className="text-[15px] font-medium text-gray-600 hover:text-[#042055] transition-colors"
                         >
                             {link.name}
                         </Link>
@@ -61,7 +61,7 @@ const Navbar = () => {
                                 Logout
                             </button>
                             <Link href={user.role === "ADMIN" ? "/admin/dashboard" : user.role === "TECHNICIAN" ? "/user/diagnostics" : "/user"}>
-                                 <Button className="bg-[#FF6B00] hover:bg-[#E66000] text-white rounded-xl px-8 py-6 font-bold flex items-center gap-2 text-[15px] shadow-lg shadow-orange-500/25 active:scale-95 transition-all">
+                                 <Button className="bg-[#042055] hover:bg-[#03173d] text-white rounded-xl px-8 py-6 font-bold flex items-center gap-2 text-[15px] shadow-lg shadow-blue-500/25 active:scale-95 transition-all">
                                     Dashboard <ArrowUpRight className="w-5 h-5" />
                                  </Button>
                             </Link>
@@ -70,12 +70,12 @@ const Navbar = () => {
                         <>
                             <Link 
                                 href="/login" 
-                                className="text-[15px] font-bold text-gray-700 hover:text-[#FF6B00] transition-colors hidden sm:block"
+                                className="text-[15px] font-bold text-gray-700 hover:text-[#042055] transition-colors hidden sm:block"
                             >
                                  Login
                             </Link>
                             
-                            <Link href="/login" className="sm:hidden text-[14px] font-bold text-[#FF6B00]">
+                            <Link href="/login" className="sm:hidden text-[14px] font-bold text-[#042055]">
                                 Login
                             </Link>
                             
@@ -88,7 +88,7 @@ const Navbar = () => {
                     )}
 
                     {/* Mobile Menu Icon */}
-                    <button className="lg:hidden p-2 text-gray-600 hover:text-[#FF6B00] transition-colors">
+                    <button className="lg:hidden p-2 text-gray-600 hover:text-[#042055] transition-colors">
                         <Menu size={28} />
                     </button>
                 </div>
