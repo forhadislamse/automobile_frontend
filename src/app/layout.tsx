@@ -86,7 +86,7 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "NEXTGEN AUTO TECH",
+  title: "Smart Auto Tech",
   description: "AI-powered automotive diagnostic assistant",
 };
 
