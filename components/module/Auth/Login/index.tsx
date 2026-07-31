@@ -46,6 +46,11 @@ export default function LoginPage() {
     },
   });
 
+  const setCredentials = (email: string) => {
+    form.setValue("email", email);
+    form.setValue("password", "12345678");
+  };
+
   const onSubmit = async (data: LoginFormValues) => {
     try {
       const res = await login(data).unwrap();
@@ -183,6 +188,34 @@ export default function LoginPage() {
                 >
                   Forgot password?
                 </Link>
+              </div>
+
+              {/* Quick Login Buttons for Testing */}
+              <div className="flex flex-col gap-2 pt-2 pb-2">
+                <span className="text-xs text-gray-500 font-medium">Quick Login (Test Accounts):</span>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setCredentials("admin@gmail.com")}
+                    className="px-3 py-1.5 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-200 rounded-md transition-colors"
+                  >
+                    Admin
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCredentials("rforhadewu@gmail.com")}
+                    className="px-3 py-1.5 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-200 rounded-md transition-colors"
+                  >
+                    Shopowner
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCredentials("i.rforhad@gmail.com")}
+                    className="px-3 py-1.5 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-200 rounded-md transition-colors"
+                  >
+                    Technician
+                  </button>
+                </div>
               </div>
 
               <Button
