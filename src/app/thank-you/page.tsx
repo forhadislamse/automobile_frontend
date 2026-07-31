@@ -14,7 +14,7 @@ function ThankYouContent() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-      {/* Rebrandly Base Script & Conversion Tracking */}
+      {/* Rebrandly Base Script & Conversion Tracking 
       <Script 
         src="https://cdn.rebrandly.com/analytics/sdk/v1/rbly.min.js" 
         data-api-key="6bfffa9350fe4ffabb8998c47acb1c26"
@@ -28,6 +28,7 @@ function ThankYouContent() {
           }
         }}
       />
+      */}
       
       <div className="bg-white p-8 md:p-12 rounded-2xl shadow-xl max-w-md w-full text-center space-y-6">
         <div className="flex justify-center">
