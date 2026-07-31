@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { Check, Lock, Sparkles } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface PlanFeature {
   name: string;

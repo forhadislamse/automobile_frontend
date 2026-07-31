@@ -30,7 +30,12 @@ const otpSchema = z.object({
 
 type OtpFormData = z.infer<typeof otpSchema>;
 
-export default function Otp() {
+interface OtpProps {
+  successRedirect?: (email: string) => string;
+  successMessage?: string;
+}
+
+export default function Otp({ successRedirect, successMessage }: OtpProps = {}) {
   const searchParams = useSearchParams();
   const email = searchParams.get("email");
 
@@ -169,8 +174,11 @@ export default function Otp() {
       console.log("res", res);
 
       if (res.success) {
-        toast.success(res.message);
-        router.push(`/forgot-password/otp/change-password?email=${email}`);
+        toast.success(successMessage || res.message);
+        const redirectUrl = successRedirect 
+          ? successRedirect(email) 
+          : `/forgot-password/otp/change-password?email=${email}`;
+        router.push(redirectUrl);
       } else {
         toast.error(res.message || "Failed to verify OTP");
       }

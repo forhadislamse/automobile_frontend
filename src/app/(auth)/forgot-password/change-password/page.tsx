@@ -53,7 +53,7 @@ export default function ChangePasswordPage() {
       const res = await resetPassword({ 
         email, 
         password: data.password 
-      }).unwrap();
+      }).unwrap() as any;
 
       if (res.success) {
         setIsSuccess(true);

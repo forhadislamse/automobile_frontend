@@ -18,6 +18,7 @@ import {
     CalendarClock
 } from "lucide-react";
 import Link from "next/link";
+import { useAppSelector } from "@/redux/hooks";
 
 // Initialize Stripe outside of component to avoid recreation
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string);
@@ -101,7 +102,7 @@ function CheckoutContent() {
         );
     }
 
-    const plan = planResult?.data;
+    const plan = (planResult as any)?.data;
 
     if (!plan || !clientSecret || !orderId) {
         return (
